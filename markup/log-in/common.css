@@ -1,0 +1,26 @@
+.display-flex{
+    display: flex;
+}
+.display-flex-column{
+    flex-direction: column;
+}
+
+.display-flex-row{
+    flex-direction: row;
+}
+
+.display-flex-center{
+    justify-content: center;
+    align-items: center;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+body{
+    background-color: #0a5efb;
+}

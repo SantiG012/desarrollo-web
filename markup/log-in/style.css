@@ -1,0 +1,36 @@
+.container{
+    max-width: 70%;
+    max-height: 60vh;
+    background-color: white;
+    margin: 0 auto;
+    border-radius: 10px;
+    gap: 1em;
+}
+
+.avatar{
+    position: relative;
+}
+
+.avatar__edit-button{
+    position: absolute;
+    top: 2em;
+    right: 1em;
+    border: 0;
+    background-color: #0a5efb;
+    padding: .5em;
+    border-radius: 50%;
+    
+}
+
+form{
+    max-width: 80%;
+    gap: 1em;
+}
+
+.play-button{
+    gap: 0.5em;
+    border: 0;
+    padding: 0.5em 1em;
+    background-color: #ffbf00;
+    border-radius: 1em;
+}
