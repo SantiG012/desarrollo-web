@@ -54,3 +54,70 @@ canvas.addEventListener("mouseup", (e) => {
 });
 
 canvas.addEventListener("mousemove", draw);
+
+// Lista de palabras aleatorias
+const words = ['Manzana', 'Banana', 'Cereza', 'Damasco', 'Fresa', 'Granada', 'Kiwi', 'Limon', 'Mango', 'Naranja', 'Pera', 'Uva'];
+
+function showRandomWord() {
+  const randomIndex = Math.floor(Math.random() * words.length);
+  const word = words[randomIndex];
+  
+  const popup = document.getElementById('popup');
+  const popupWord = document.getElementById('popupWord');
+  
+  popupWord.textContent = word;
+  popup.style.display = 'block';
+  
+  setTimeout(() => {
+    popup.style.display = 'none';
+  }, 5000); // 5 segundos
+}
+
+// Llamar a la función para mostrar la palabra aleatoria cuando la página se carga
+window.addEventListener('DOMContentLoaded', () => {
+  showRandomWord();
+});
+
+
+// Temporizador
+let timeLeft = 180; // 180 segundos
+
+function updateTimer() {
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+
+  const formattedMinutes = String(minutes).padStart(2, '0');
+  const formattedSeconds = String(seconds).padStart(2, '0');
+
+  document.getElementById('timer').textContent = `${formattedMinutes}:${formattedSeconds}`;
+
+  if (timeLeft > 0) {
+    timeLeft--;
+    setTimeout(updateTimer, 1000);
+  } else {
+    alert('Tiempo finalizado');
+  }
+}
+
+updateTimer(); // Iniciar el temporizador al cargar la página
+
+// Chat
+const chatInput = document.getElementById('chat-input');
+const chatMessages = document.getElementById('chat-messages');
+
+document.getElementById('send-message').addEventListener('click', function() {
+  const message = chatInput.value;
+  if (message.trim() !== '') {
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    chatMessages.appendChild(messageElement);
+    chatInput.value = '';
+  }
+});
+
+chatInput.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    document.getElementById('send-message').click();
+  }
+});
