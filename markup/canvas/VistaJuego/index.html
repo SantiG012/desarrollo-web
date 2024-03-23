@@ -1,0 +1,97 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Drawing app</title>
+  </head>
+  <body>
+    <section class="container">
+      <div id="toolbar">
+        <h1>Gartic</h1>
+        <label for="color">Color:</label>
+        <input id="color" name="color" type="color" />
+
+        <label for="lineWidth">Line Width:</label>
+        <input id="lineWidth" name="lineWidth" type="number" value="5" />
+
+        <button id="clear">Clear</button>
+      </div>
+
+      <div class="content">
+        <div class="drawing-board">
+          <canvas id="drawing-board"></canvas>
+        </div>
+
+        <!-- ... -->
+<div id="popup" class="popup">
+  <h2 id="popupWord"></h2>
+</div>
+<!-- ... -->
+
+<!-- ... -->
+<header>
+  <button onclick="showRandomWord()">
+</header>
+<!-- ... -->
+
+        <!-- Temporizador -->
+        <div id="timer" class="timer">03:00</div>
+
+        <!-- Chat -->
+        <div class="chat">
+          <h2>Chat</h2>
+          <div id="chat-messages"></div>
+          <input type="text" id="chat-input" placeholder="Escribe un mensaje" />
+          <button id="send-message">Enviar</button>
+        </div>
+      </div>
+    </section>
+    <script src="./index.js"></script>
+    <script>
+      // Temporizador
+      let timeLeft = 180; // 180 segundos
+
+      function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        const formattedSeconds = String(seconds).padStart(2, '0');
+
+        document.getElementById('timer').textContent = `${formattedMinutes}:${formattedSeconds}`;
+
+        if (timeLeft > 0) {
+          timeLeft--;
+          setTimeout(updateTimer, 1000);
+        } else {
+          alert('Tiempo finalizado');
+        }
+      }
+
+      updateTimer(); // Iniciar el temporizador al cargar la página
+
+      // Chat
+      const chatInput = document.getElementById('chat-input');
+      const chatMessages = document.getElementById('chat-messages');
+
+      document.getElementById('send-message').addEventListener('click', function() {
+        const message = chatInput.value;
+        if (message.trim() !== '') {
+          const messageElement = document.createElement('div');
+          messageElement.textContent = message;
+          chatMessages.appendChild(messageElement);
+          chatInput.value = '';
+        }
+      });
+
+      chatInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          document.getElementById('send-message').click();
+        }
+      });
+    </script>
+  </body>
+</html>
