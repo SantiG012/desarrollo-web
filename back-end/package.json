@@ -10,5 +10,8 @@
     "web-sockets"
   ],
   "author": "Santiago Gómez",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
 }
