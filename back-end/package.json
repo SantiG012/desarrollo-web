@@ -4,6 +4,7 @@
   "description": "A pinturillo's imitation",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -12,11 +13,14 @@
   "author": "Santiago Gómez",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.19.2"
+    "D": "^1.0.0",
+    "express": "^4.19.2",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.21",
+    "nodemon": "^3.1.0",
     "typescript": "^5.4.5"
   }
 }
