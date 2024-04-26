@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS palabras_por_categoria (
     id_categoria INT,
     FOREIGN KEY (id_palabra) REFERENCES palabra(id),
     FOREIGN KEY (id_categoria) REFERENCES categoria(id),
-    PRIMARY KEY (id),
     UNIQUE(id_palabra, id_categoria)
 );
 
@@ -25,6 +24,6 @@ CREATE TABLE IF NOT EXISTS sala_de_juego (
     nombre VARCHAR(100),
     id_categoria INT,
     estado VARCHAR(20),
-    FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria),
+    FOREIGN KEY (id_categoria) REFERENCES categoria(id),
     UNIQUE (nombre)
 );
