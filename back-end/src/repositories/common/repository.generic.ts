@@ -9,22 +9,22 @@ export class GenericRepository<T extends EntityBase> implements IRepository<T>{
         this._repository = repository;
     }
 
-    getOneBy(options: Object): Promise<T | null> {
+    async getOneBy(options: Object): Promise<T | null> {
        return this._repository.findOneBy(options);
     }
-    getBy(options: Object): Promise<T[]> {
+    async getBy(options: Object): Promise<T[]> {
         return this._repository.findBy(options);
     }
-    getAll(): Promise<T[]> {
+    async getAll(): Promise<T[]> {
         return this._repository.find();
     }
-    create(entity: T): Promise<T> {
+    async create(entity: T): Promise<T> {
         return this._repository.save(entity);
     }
-    update(entity: T): Promise<T> {
+    async update(entity: T): Promise<T> {
         return this._repository.save(entity);
     }
-    delete(entity: T): Promise<void> {
+    async delete(entity: T): Promise<void> {
         return this._repository.delete(entity);
     }
 
