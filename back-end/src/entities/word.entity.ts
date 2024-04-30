@@ -8,5 +8,5 @@ export class Word extends EntityBase{
     text:string;
 
     @OneToMany(()=> WordsByCategory, (wordsByCategory)=>wordsByCategory.word)
-    wordsByCategory:WordsByCategory;
+    wordsByCategory:WordsByCategory[];
 }

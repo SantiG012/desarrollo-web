@@ -9,9 +9,9 @@ export class Category extends EntityBase{
     name:string;
 
     @OneToMany(()=> WordsByCategory, (wordsByCategory)=>wordsByCategory.category)
-    wordsByCategory:WordsByCategory;
+    wordsByCategory:WordsByCategory[];
 
     @OneToMany(()=>PlayRooms, (playRoom)=>playRoom.category)
-    playRoom: PlayRooms;
+    playRoom: PlayRooms[];
 
 }
