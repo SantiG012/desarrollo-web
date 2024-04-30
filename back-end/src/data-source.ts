@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 
 import * as dotenv from "dotenv";
+import { Category, PlayRooms, Word, WordsByCategory } from "./entities";
 
 
 
@@ -19,7 +20,7 @@ export const AppDataSource = new DataSource({
   database: DB_DATABASE,
   synchronize: false,
   logging:  false,
-  entities: [],
+  entities: [Word, Category, WordsByCategory, PlayRooms],
   migrations: [__dirname + "/migration/*.ts"],
   subscribers: [],
 });
