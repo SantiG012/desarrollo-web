@@ -21,9 +21,11 @@ export class WordsByCategoryUseCases {
 
         const wordDb = await this.wordRepository.getOneBy({id:wordId});
 
-        if(!wordDb){ throw new ApiError(`La palabra con ${wordId} no existe`, StatusCodes.BadRequest)}
+        if(!wordDb) { throw new ApiError(`La palabra con id=${wordId} no existe`, StatusCodes.BadRequest)}
 
         const categoryDb =  await this.categoryRepository.getOneBy({id:categoryId});
+
+        if(!categoryDb) { throw new ApiError(`La categoría con id=${categoryId} no existe`, StatusCodes.BadRequest)}
 
         return await this.wordsByCategoryRepository.create(wordsByCategory);
     }
