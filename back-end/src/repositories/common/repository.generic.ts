@@ -24,8 +24,8 @@ export class GenericRepository<T extends EntityBase> implements IRepository<T>{
     async update(entity: T): Promise<T> {
         return this._repository.save(entity);
     }
-    async delete(entity: T): Promise<void> {
-        return this._repository.delete(entity);
+    async delete(id:number): Promise<void> {
+        await this._repository.delete(id);
     }
 
 }

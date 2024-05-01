@@ -6,5 +6,5 @@ export interface IRepository<T extends EntityBase>{
     getAll():Promise<T[]>;
     create(entity:T):Promise<T>;
     update(entity:T):Promise<T>;
-    delete(entity:T):Promise<void>;   
+    delete(id:number):Promise<void>;   
 }
