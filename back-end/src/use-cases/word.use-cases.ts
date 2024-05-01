@@ -47,6 +47,6 @@ export class WordUseCases {
 
         if (!wordDb){ throw new ApiError(`La palabra con ${id} no existe`, StatusCodes.BadRequest)}
 
-        return await this.wordRepository.delete()
+        return await this.wordRepository.delete(wordDb);
     }
 }
