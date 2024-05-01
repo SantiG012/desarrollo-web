@@ -14,7 +14,7 @@ export class WordUseCases {
     public async addWord(word:Word):Promise<Word>{
         const wordText = word.text.toUpperCase()
 
-        const wordDb = await this.wordRepository.getOneBy({ wordText });
+        const wordDb = await this.wordRepository.getOneBy({ text:wordText });
 
         if (wordDb){ throw new ApiError(`La palabra ${word.text} ya existe`, StatusCodes.BadRequest)}
 
@@ -33,7 +33,7 @@ export class WordUseCases {
 
         const wordText = word.text.toUpperCase()
 
-        wordDb = await this.wordRepository.getOneBy({ wordText });
+        wordDb = await this.wordRepository.getOneBy({ text: wordText });
 
         if (wordDb){ throw new ApiError(`La palabra ${word.text} ya existe`, StatusCodes.BadRequest)}
 
