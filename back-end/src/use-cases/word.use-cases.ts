@@ -42,7 +42,7 @@ export class WordUseCases {
         return await this.wordRepository.update(word);
     }
 
-    public async deleteWord(id:number){
+    public async deleteWord(id:number):Promise<void>{
         const wordDb = await this.wordRepository.getOneBy({id});
 
         if (!wordDb){ throw new ApiError(`La palabra con ${id} no existe`, StatusCodes.BadRequest)}
