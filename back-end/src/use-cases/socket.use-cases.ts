@@ -29,13 +29,17 @@ export class SocketUseCases {
         //TODO: Generar el UUID
         this.players.push(player);
 
-        this.notifyNewPlayer(ws,player.name);
+        const joinMessage=`${player.name} has joined`;
+
+        this.send(joinMessage,ws,playRoomId);
     }
 
-    private notifyNewPlayer(ws:any,newPlayerName:string):void{
-        this.players.forEach((player:Player)=>{
+    public send(message:any,ws:any,playRoomId:number):void{
+        const roomPlayers = this.players.filter((player: Player) => player.playRoomId == playRoomId);
+        
+        roomPlayers.forEach((player:Player)=>{
             if (player.ws !== ws && player.ws.readyState === 1) {
-                player.ws.send(`${newPlayerName} has joined`);
+                player.ws.send(message);
             }
         })
     }
