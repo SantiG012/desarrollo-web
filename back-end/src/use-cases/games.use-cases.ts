@@ -99,5 +99,17 @@ export class GameUseCases {
         this.send(`Es el turno de ${player.name}`,player.ws,roomId);
     }
 
+    public wordGuessed(roomId:number, userAttempt:string):boolean{
+        const word = this.roomsInfo[roomId]["roomWords"][this.roomsInfo[roomId]["wordIndex"]];
+        return word.toUpperCase() === userAttempt.toUpperCase();
+    }
+
+    public updateScore(roomId:number,player:Player):void{
+        const elapsedTime = Date.now() - this.roomsInfo[roomId]["initialTime"];
+        const score = elapsedTime;
+        this.roomsInfo[roomId]["guessOrdering"].push(player);
+        const playerPosition = this.roomsInfo[roomId]["guessOrdering"].indexOf(player);
+        player.score += (score* Math.abs(playerPosition-5));
+    }
     
 }
