@@ -4,4 +4,5 @@ export interface Player {
     name:string;
     avatar:string;
     ws:any;
+    score:number;
 }
