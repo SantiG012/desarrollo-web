@@ -9,7 +9,7 @@ import { Player } from "../interfaces";
 import { GenericRepository } from "../repositories/common";
 
 export class SocketUseCases {
-    private players:Player[];
+    private players:Player[] = [];
     private activePlayRooms:PlayRooms[];
     private playRoomRepository:GenericRepository<PlayRooms>;
 
@@ -20,22 +20,22 @@ export class SocketUseCases {
     public async joinPlayRoom(player:Player,playRoomId:number,ws:any):Promise<void>{
         const playRoomDb = await this.playRoomRepository.getOneBy({id:playRoomId})
 
-        if(player.playRoomId !== playRoomId){throw new ApiError(`El id de la sala de juegos id=${playRoomId} con coincide con el id id=${player.playRoomId}`,StatusCodes.BadRequest)}
-
         if(!playRoomDb){throw new ApiError(`La sala de juegos con id=${playRoomId} no existe`,StatusCodes.BadRequest)}
+        
+        if(player.playRoomId != playRoomId){throw new ApiError(`El id de la sala de juegos id=${playRoomId} con coincide con el id=${player.playRoomId}`,StatusCodes.BadRequest)}
 
         if(playRoomDb.state === PlayRoomStatus.Waiting){playRoomDb.state = PlayRoomStatus.Active; await this.playRoomRepository.update(playRoomDb)}
 
         //TODO: Generar el UUID
-        this.players.push(player)
+        this.players.push(player);
 
-        this.notifyNewPlayer()
+        this.notifyNewPlayer(ws,player.name);
     }
 
-    private notifyNewPlayer():void{
-        this.players.forEach((player:Player,ws:any)=>{
-            if (player.ws !== ws && player.ws.readyState === ws.OPEN) {
-                player.ws.send(`${player.name} has joined`);
+    private notifyNewPlayer(ws:any,newPlayerName:string):void{
+        this.players.forEach((player:Player)=>{
+            if (player.ws !== ws && player.ws.readyState === 1) {
+                player.ws.send(`${newPlayerName} has joined`);
             }
         })
     }
