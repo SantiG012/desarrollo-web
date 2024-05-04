@@ -1,13 +1,19 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import { AppDataSource } from "./data-source";
+const cors = require('cors');
 
 // configures dotenv to work in your application
 dotenv.config();
-const app = express();
-
 const PORT = process.env.PORT;
+const app = express();
+const wsInstance = require('express-ws')(app);
+const webSocketRouter = require('./routes/socket.routes')(wsInstance);
 
+
+app.use(cors());
+app.use(express.json());
+app.use("/ws",webSocketRouter);
 app.get("/", (request: Request, response: Response) => { 
   response.status(200).send("Hello World");
 }); 
