@@ -1,4 +1,4 @@
-import { Column, ManyToOne, Entity } from "typeorm";
+import { Column, ManyToOne, Entity, JoinColumn } from "typeorm";
 import { EntityBase } from "./common";
 import { Category } from "./category.entity";
 
@@ -11,5 +11,6 @@ export class PlayRooms extends EntityBase {
     state:string;
 
     @ManyToOne(()=>Category, (category)=>category.playRoom)
+    @JoinColumn({name:'id_categoria'})
     category:Category;
 }
