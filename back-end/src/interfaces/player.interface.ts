@@ -3,4 +3,5 @@ export interface Player {
     playRoomId:number;
     name:string;
     avatar:string;
+    ws:any;
 }
