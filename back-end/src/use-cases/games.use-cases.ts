@@ -2,11 +2,11 @@ import { PlayRoomStatus } from "../Enums/play-room-status.enum";
 import { StatusCodes } from "../Enums/status-codes.enum";
 import { ApiError } from "../Errors";
 import { AppDataSource } from "../data-source";
-import { PlayRooms, Word, WordsByCategory } from "../entities";
+import { PlayRooms, WordsByCategory } from "../entities";
 import { Player } from "../interfaces";
 import { GenericRepository } from "../repositories/common";
 
-export class SocketUseCases {
+export class GameUseCases {
     private playRoomRepository:GenericRepository<PlayRooms>;
     private wordsByCategoryRepository:GenericRepository<WordsByCategory>;
 

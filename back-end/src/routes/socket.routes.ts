@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { SocketUseCases } from "../use-cases/socket.use-cases";
+import { GameUseCases } from "../use-cases/games.use-cases";
 import { Player } from "../interfaces";
 import { WebScoketEventTypes } from "../Enums/ws-events-types.enum";
 
@@ -9,24 +9,22 @@ const router = express.Router();
 module.exports = (expressWs:any) =>{
     expressWs.applyTo(router);
 
-    const socketUseCases = new SocketUseCases();
+    const gameUseCases = new GameUseCases();
 
     router.ws('/room/:roomId',async (ws:any,req:any)=>{
         const roomId:number =  parseInt(req.params.roomId);
         const player:Player = JSON.parse(req.headers['player']);
         player.ws = ws;
 
-        if(!socketUseCases.roomsInfo[roomId]){await socketUseCases.initializeEmptyRoomsInfo(roomId,player)} else{await socketUseCases.joinPlayRoom(player,roomId);}
+        if(!gameUseCases.roomsInfo[roomId]){await gameUseCases.initializeEmptyRoomsInfo(roomId,player)} else{await gameUseCases.joinPlayRoom(player,roomId);}
 
         const joinMessage=`${player.name} has joined`;
-        socketUseCases.send(joinMessage,ws,roomId);
+        gameUseCases.send(joinMessage,ws,roomId);
 
-        if(socketUseCases.roomsInfo[roomId]["roomPlayers"].length > 1 && socketUseCases.roomsInfo[roomId]["player"] === undefined){socketUseCases.startGame(roomId);}
+        if(gameUseCases.roomsInfo[roomId]["roomPlayers"].length > 1 && gameUseCases.roomsInfo[roomId]["player"] === undefined){gameUseCases.startGame(roomId);}
     
-        ws.on(WebScoketEventTypes.Message, async function (message:any){
-            const test = JSON.parse(message);
-            console.log(test.message);
-            await socketUseCases.send(`${player.name}: ${message}`,ws,roomId);
+        ws.on(WebScoketEventTypes.Message, async function (message:string){
+            await gameUseCases.send(`${player.name}: ${message}`,ws,roomId);
         })
     })
 
