@@ -29,6 +29,10 @@ module.exports = (expressWs:any) =>{
             if(!gameUseCases.wordGuessed(roomId,message)){return;}
 
             gameUseCases.updateScore(roomId,player);
+
+            const scoreMessage = `${player.name} ha acertado la palabra!`;
+
+            gameUseCases.send(scoreMessage,undefined,roomId);
         })
     })
 
