@@ -34,8 +34,14 @@ export class SocketUseCases {
         this.send(joinMessage,ws,playRoomId);
     }
 
-    public send(message:any,ws:any,playRoomId:number):void{
+    public async send(message:any,ws:any,playRoomId:number):Promise<void>{
+        const playRoomDb = await this.playRoomRepository.getOneBy({id:playRoomId})
+
+        if(!playRoomDb){throw new ApiError(`La sala de juegos con id=${playRoomId} no existe`,StatusCodes.BadRequest)}
+
         const roomPlayers = this.players.filter((player: Player) => player.playRoomId == playRoomId);
+
+        if(!roomPlayers) {return;}
         
         roomPlayers.forEach((player:Player)=>{
             if (player.ws !== ws && player.ws.readyState === 1) {
