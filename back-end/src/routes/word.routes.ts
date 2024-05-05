@@ -22,4 +22,11 @@ router.put("/",
     }   
 );
 
+router.delete("/:id",
+    async (req: Request, res: Response) => {
+        const id = parseInt(req.params.id);
+        res.status(200).send(await wordUseCases.deleteWord(id));
+    }
+);
+
 export default router;
