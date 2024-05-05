@@ -101,6 +101,10 @@ export class GameUseCases {
 
     public resetGame(roomId:number):void{
         this.roomsInfo[roomId]["guessOrdering"] = [];
+        const wordIndex = this.roomsInfo[roomId]["wordIndex"];
+        this.roomsInfo[roomId]["roomWords"].splice(wordIndex,1);
+        const wordsLength =  this.roomsInfo[roomId]["roomWords"].length
+        this.roomsInfo[roomId]["wordIndex"] = Math.floor(Math.random() * wordsLength);
         this.startGame(roomId);
     }
 
