@@ -111,5 +111,9 @@ export class GameUseCases {
         const playerPosition = this.roomsInfo[roomId]["guessOrdering"].indexOf(player);
         player.score += (score* Math.abs(playerPosition-5));
     }
+
+    public isDrawing(player:Player,roomId:number):boolean{
+        return this.roomsInfo[roomId]["player"]===player;
+    }
     
 }

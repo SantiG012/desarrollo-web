@@ -25,6 +25,8 @@ module.exports = (expressWs:any) =>{
     
         ws.on(WebScoketEventTypes.Message, async function (message:string){
             await gameUseCases.send(`${player.name}: ${message}`,ws,roomId);
+            
+            if(gameUseCases.isDrawing(player,roomId)){return;}
 
             if(!gameUseCases.wordGuessed(roomId,message)){return;}
 
