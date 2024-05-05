@@ -25,10 +25,10 @@ module.exports = (expressWs:any) =>{
     
         ws.on(WebScoketEventTypes.Message, async function (message:string){
             if(gameUseCases.isDrawing(player,roomId)){return;}
-            
-            await gameUseCases.send(`${player.name}: ${message}`,ws,roomId);
 
-            if(!gameUseCases.wordGuessed(roomId,message)){return;}
+            if(gameUseCases.alreadyWon(player, roomId)){return;}
+
+            if(!gameUseCases.wordGuessed(roomId,message)){await gameUseCases.send(`${player.name}: ${message}`,ws,roomId);return;}
 
             gameUseCases.updateScore(roomId,player);
 

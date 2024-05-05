@@ -115,5 +115,9 @@ export class GameUseCases {
     public isDrawing(player:Player,roomId:number):boolean{
         return this.roomsInfo[roomId]["player"]===player;
     }
+
+    public alreadyWon(player:Player, roomId:number):boolean{
+        return this.roomsInfo[roomId]["guessOrdering"].includes(player);
+    }
     
 }
