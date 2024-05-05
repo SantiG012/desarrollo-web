@@ -2,6 +2,7 @@ import { Router } from "express";
 import { GameUseCases } from "../use-cases/games.use-cases";
 import { Player } from "../interfaces";
 import { WebScoketEventTypes } from "../Enums/ws-events-types.enum";
+import { PlayRoomStatus } from "../Enums/play-room-status.enum";
 
 const express = require('express');
 const router = express.Router();
@@ -16,12 +17,15 @@ module.exports = (expressWs:any) =>{
         const player:Player = JSON.parse(req.headers['player']);
         player.ws = ws;
 
-        if(!gameUseCases.roomsInfo[roomId]){await gameUseCases.initializeEmptyRoomsInfo(roomId,player)} else{await gameUseCases.joinPlayRoom(player,roomId);}
+
+        if(!gameUseCases.roomsInfo[roomId]){await gameUseCases.initializeEmptyRoomsInfo(roomId,player);} 
+        else if(gameUseCases.roomsInfo[roomId]["state"] === PlayRoomStatus.Waiting){await gameUseCases.initializeEmptyRoomsInfo(roomId,player)}
+        else{await gameUseCases.joinPlayRoom(player,roomId);}
 
         const joinMessage=`${player.name} has joined`;
         gameUseCases.send(joinMessage,ws,roomId);
 
-        if(gameUseCases.roomsInfo[roomId]["roomPlayers"].length > 1 && gameUseCases.roomsInfo[roomId]["player"] === undefined){gameUseCases.startGame(roomId);}
+        if(gameUseCases.hasEnoughPlayers(roomId) && !gameUseCases.hasSelectedPlayer(roomId)){gameUseCases.startGame(roomId);}
     
         ws.on(WebScoketEventTypes.Message, async function (message:string){
             if(gameUseCases.isDrawing(player,roomId)){return;}
@@ -38,14 +42,19 @@ module.exports = (expressWs:any) =>{
 
             if (!gameUseCases.allWon(roomId)){return;}
 
-            gameUseCases.resetGame(roomId);
-
-            if(gameUseCases.isGameOver(roomId)) {
-                gameUseCases.sendResults(roomId);
-                gameUseCases.closeConnections(roomId);
-                gameUseCases.deleteRoom(roomId);
+            if(gameUseCases.isGameOver(roomId)){
+                await gameUseCases.sendResults(roomId);
+                await gameUseCases.closeConnections(roomId);
                 return;
             }
+
+            gameUseCases.deleteGuessedWord(roomId);
+
+            gameUseCases.resetGame(roomId);
+        })
+
+        ws.on(WebScoketEventTypes.Close,async function(){
+            if(gameUseCases.isGameOver(roomId)){await gameUseCases.changeRoomStatus(roomId);return;}
         })
     })
 

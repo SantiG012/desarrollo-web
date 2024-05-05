@@ -18,7 +18,8 @@ export class GameUseCases {
             wordIndex: 0,
             player: {},
             initialTime: Date.now(),
-            category: {}
+            category: {},
+            state: ""
         }
     };
     
@@ -83,7 +84,8 @@ export class GameUseCases {
             wordIndex: randomIndex,
             player: undefined,
             initialTime: undefined,
-            category: playRoomDb.category
+            category: playRoomDb.category,
+            state: playRoomDb.state
         }
     }
 
@@ -101,11 +103,13 @@ export class GameUseCases {
 
     public resetGame(roomId:number):void{
         this.roomsInfo[roomId]["guessOrdering"] = [];
-        const wordIndex = this.roomsInfo[roomId]["wordIndex"];
-        this.roomsInfo[roomId]["roomWords"].splice(wordIndex,1);
         const wordsLength =  this.roomsInfo[roomId]["roomWords"].length
         this.roomsInfo[roomId]["wordIndex"] = Math.floor(Math.random() * wordsLength);
         this.startGame(roomId);
+    }
+
+    public deleteGuessedWord(roomId:number):void{
+        this.roomsInfo[roomId]["roomWords"].splice(this.roomsInfo[roomId]["wordIndex"],1);
     }
 
     public wordGuessed(roomId:number, userAttempt:string):boolean{
@@ -115,7 +119,7 @@ export class GameUseCases {
 
     public isGameOver(roomId:number):boolean{
         const wordsLength =  this.roomsInfo[roomId]["roomWords"].length;
-        return wordsLength === 0;
+        return wordsLength === 1;
     }
 
     public updateScore(roomId:number,player:Player):void{
@@ -141,12 +145,19 @@ export class GameUseCases {
         return winners === (roomPlayers-1);
     }
 
-    public closeConnections(roomId:number):void{
+    public async closeConnections(roomId:number):Promise<void[]>{
         const players:Player[] = this.roomsInfo[roomId]["roomPlayers"];
-        players.forEach((player:Player)=>{player.ws.close();})
+
+        const promises: Promise<void>[] = players.map((player: Player) => {
+            return new Promise<void>(() => {
+                player.ws.close();
+            });
+        });
+
+        return await Promise.all(promises);
     }
 
-    public sendResults(roomId:number):void{
+    public async sendResults(roomId:number):Promise<void>{
         const results = this.roomsInfo[roomId]["roomPlayers"].map((player: Player) => ({
             "nombre": player.name,
             "puntos": player.score
@@ -154,13 +165,53 @@ export class GameUseCases {
         
         const players:Player[] = this.roomsInfo[roomId]["roomPlayers"];
 
-        players.forEach((player: Player) => {
-            player.ws.send(`El juego terminó. Los resultados son: ${JSON.stringify(results)}`);
+
+        const promises: Promise<void>[] = players.map((player: Player) => {
+            return new Promise<void>((resolve, reject) => {
+                player.ws.send(`El juego terminó. Los resultados son: ${JSON.stringify(results)}`, (error: Error | null) => {
+                    if (error) {
+                        reject(error); // If there's an error in sending the message
+                    } else {
+                        resolve(); // If the message is sent successfully
+                    }
+                });
+            });
         });
+        
+        // Wait for all promises to resolve
+        Promise.all(promises)
+            .then(() => {
+                console.log("All messages sent successfully.");
+            })
+            .catch((error) => {
+                console.error("Error sending messages:", error);
+            });
+        
     }
 
-    public deleteRoom(roomId:number):void{
-        this.roomsInfo[roomId] = undefined;
+    public async changeRoomStatus(roomId:number):Promise<void>{
+        this.roomsInfo[roomId]["roomPlayers"] = [];
+        this.roomsInfo[roomId]["roomWords"] = [];
+        this.roomsInfo[roomId]["guessOrdering"] = [];
+        this.roomsInfo[roomId]["wordIndex"] = 0;
+        this.roomsInfo[roomId]["player"] = undefined;
+        this.roomsInfo[roomId]["initialTime"] = undefined;
+        this.roomsInfo[roomId]["category"] = {};
+        this.roomsInfo[roomId]["state"] = PlayRoomStatus.Waiting;
+
+        const playRoomDb = await this.playRoomRepository.getOneBy({id:roomId})
+
+        if(playRoomDb){playRoomDb.state = PlayRoomStatus.Waiting; await this.playRoomRepository.update(playRoomDb)}
+
+        return;
+    }
+
+    public hasEnoughPlayers(roomId:number):boolean{
+        return this.roomsInfo[roomId]["roomPlayers"].length > 1;
+    }
+
+    public hasSelectedPlayer(roomId:number):boolean{
+        return this.roomsInfo[roomId]["player"] !== undefined;
     }
     
 }
