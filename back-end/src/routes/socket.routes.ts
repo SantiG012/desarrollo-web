@@ -38,7 +38,7 @@ module.exports = (expressWs:any) =>{
 
             if (!gameUseCases.allWon(roomId)){return;}
 
-            
+            gameUseCases.resetGame(roomId);
 
         })
     })

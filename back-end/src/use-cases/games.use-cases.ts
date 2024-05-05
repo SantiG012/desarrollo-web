@@ -99,6 +99,11 @@ export class GameUseCases {
         this.send(`Es el turno de ${player.name}`,player.ws,roomId);
     }
 
+    public resetGame(roomId:number):void{
+        this.roomsInfo[roomId]["guessOrdering"] = [];
+        this.startGame(roomId);
+    }
+
     public wordGuessed(roomId:number, userAttempt:string):boolean{
         const word = this.roomsInfo[roomId]["roomWords"][this.roomsInfo[roomId]["wordIndex"]];
         return word.toUpperCase() === userAttempt.toUpperCase();
