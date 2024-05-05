@@ -24,9 +24,9 @@ module.exports = (expressWs:any) =>{
         if(gameUseCases.roomsInfo[roomId]["roomPlayers"].length > 1 && gameUseCases.roomsInfo[roomId]["player"] === undefined){gameUseCases.startGame(roomId);}
     
         ws.on(WebScoketEventTypes.Message, async function (message:string){
-            await gameUseCases.send(`${player.name}: ${message}`,ws,roomId);
-            
             if(gameUseCases.isDrawing(player,roomId)){return;}
+            
+            await gameUseCases.send(`${player.name}: ${message}`,ws,roomId);
 
             if(!gameUseCases.wordGuessed(roomId,message)){return;}
 
