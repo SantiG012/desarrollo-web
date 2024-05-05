@@ -40,6 +40,12 @@ module.exports = (expressWs:any) =>{
 
             gameUseCases.resetGame(roomId);
 
+            if(gameUseCases.isGameOver(roomId)) {
+                gameUseCases.sendResults(roomId);
+                gameUseCases.closeConnections(roomId);
+                gameUseCases.deleteRoom(roomId);
+                return;
+            }
         })
     })
 

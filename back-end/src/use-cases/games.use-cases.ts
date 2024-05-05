@@ -113,6 +113,11 @@ export class GameUseCases {
         return word.toUpperCase() === userAttempt.toUpperCase();
     }
 
+    public isGameOver(roomId:number):boolean{
+        const wordsLength =  this.roomsInfo[roomId]["roomWords"].length;
+        return wordsLength === 0;
+    }
+
     public updateScore(roomId:number,player:Player):void{
         const elapsedTime = Date.now() - this.roomsInfo[roomId]["initialTime"];
         const score = elapsedTime;
@@ -134,6 +139,28 @@ export class GameUseCases {
         const roomPlayers = this.roomsInfo[roomId]["roomPlayers"].length;
 
         return winners === (roomPlayers-1);
+    }
+
+    public closeConnections(roomId:number):void{
+        const players:Player[] = this.roomsInfo[roomId]["roomPlayers"];
+        players.forEach((player:Player)=>{player.ws.close();})
+    }
+
+    public sendResults(roomId:number):void{
+        const results = this.roomsInfo[roomId]["roomPlayers"].map((player: Player) => ({
+            "nombre": player.name,
+            "puntos": player.score
+        }));
+        
+        const players:Player[] = this.roomsInfo[roomId]["roomPlayers"];
+
+        players.forEach((player: Player) => {
+            player.ws.send(`El juego terminó. Los resultados son: ${JSON.stringify(results)}`);
+        });
+    }
+
+    public deleteRoom(roomId:number):void{
+        this.roomsInfo[roomId] = undefined;
     }
     
 }
