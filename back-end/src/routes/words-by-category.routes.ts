@@ -21,3 +21,5 @@ router.delete("/",
        res.status(200).send(await wordsByCategoryUseCases.disassociateWordWithCategory(wordsByCategory));
     }
 );
+
+export default router;

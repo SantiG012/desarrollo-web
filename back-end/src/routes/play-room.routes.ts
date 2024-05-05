@@ -37,3 +37,5 @@ router.delete("/:id",
         res.status(200).send(await playRoomUseCases.deletePlayRoom(id));
     }
 );
+
+export default router;
