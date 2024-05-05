@@ -35,6 +35,11 @@ module.exports = (expressWs:any) =>{
             const scoreMessage = `${player.name} ha acertado la palabra!`;
 
             gameUseCases.send(scoreMessage,undefined,roomId);
+
+            if (!gameUseCases.allWon(roomId)){return;}
+
+            
+
         })
     })
 

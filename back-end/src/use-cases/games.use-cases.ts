@@ -119,5 +119,12 @@ export class GameUseCases {
     public alreadyWon(player:Player, roomId:number):boolean{
         return this.roomsInfo[roomId]["guessOrdering"].includes(player);
     }
+
+    public allWon(roomId:number):boolean{
+        const winners = this.roomsInfo[roomId]["guessOrdering"].length;
+        const roomPlayers = this.roomsInfo[roomId]["roomPlayers"].length;
+
+        return winners === (roomPlayers-1);
+    }
     
 }
