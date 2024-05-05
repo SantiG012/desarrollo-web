@@ -1,16 +1,35 @@
 import { StatusCodes } from "../Enums/status-codes.enum";
 import { ApiError } from "../Errors";
 import { AppDataSource } from "../data-source";
-import { Category, PlayRooms } from "../entities";
+import { Category, PlayRooms, WordsByCategory } from "../entities";
 import { GenericRepository } from "../repositories/common";
 
 export class PlayRoomUseCases {
     private playRoomRepository:GenericRepository<PlayRooms>;
     private categoryRepository:GenericRepository<Category>;
+    private wordsByCategoryRepository:GenericRepository<WordsByCategory>;
+    
 
     constructor(){
         this.playRoomRepository = new GenericRepository<PlayRooms>(AppDataSource.getRepository(PlayRooms));
         this.categoryRepository = new GenericRepository<Category>(AppDataSource.getRepository(Category));
+        this.wordsByCategoryRepository = new GenericRepository<WordsByCategory>(AppDataSource.getRepository(WordsByCategory));
+    }
+
+    public async getPlayRoomsWords(id:number):Promise<string[]>{
+        const playRoomDb = await this.playRoomRepository.getOneBy({id});
+        if(!playRoomDb){throw new ApiError(`La sala de juegos con id=${id} no existe`,StatusCodes.BadRequest)}
+
+        const categoryId = playRoomDb.category.id;
+
+        const wordsByCategory = await this.wordsByCategoryRepository.get({where:{category:{id:categoryId}}, relations:{word:true}});
+
+        return wordsByCategory.map(w=>w.word.text);
+    }
+
+    public async getPlayRooms(state:string, categoryId:number):Promise<PlayRooms[]>{
+        const playRooms = await this.playRoomRepository.get({where:{state, category:{id:categoryId}}});
+        return playRooms;
     }
 
     public async createPlayRoom(playRoom:PlayRooms):Promise<PlayRooms>{
