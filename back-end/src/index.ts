@@ -22,13 +22,13 @@ const webSocketRouter = require('./routes/socket.routes')(wsInstance);
 
 app.use(cors());
 app.use(express.json());
-app.use(ErrorHandler);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/ws",webSocketRouter);
 app.use("/api/v1/words", wordRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/words-by-category", wordsByCategoryRoutes);
 app.use("/api/v1/play-rooms", playRoomRoutes);
+app.use(ErrorHandler);
 
 AppDataSource.initialize()
   .then(async () => {
