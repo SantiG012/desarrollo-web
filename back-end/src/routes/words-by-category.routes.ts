@@ -20,12 +20,12 @@ router.post("/",
     }
 );
 
-router.delete("/",
+router.delete("/:id",
     schemaValidator("/words-by-category"),
     async (req: Request, res: Response,next:NextFunction) => {
-       const wordsByCategory = req.body;
+       const id = parseInt(req.params.id);
        try{
-        res.status(201).send(await wordsByCategoryUseCases.disassociateWordWithCategory(wordsByCategory));
+        res.status(200).send(await wordsByCategoryUseCases.disassociateWordWithCategory(id));
     } catch (error) {
         next(error);
     }
