@@ -24,7 +24,7 @@ router.get("/:id/words",
 );
 
 router.post("/", 
-    schemaValidator("playRoom"),
+    schemaValidator("/play-rooms"),
     async (req: Request, res: Response) => {
         const playRoom = req.body;
         res.status(201).send(await playRoomUseCases.createPlayRoom(playRoom));

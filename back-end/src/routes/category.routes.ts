@@ -7,7 +7,7 @@ const router = Router();
 const categoryUseCases:CategoryUseCases = new CategoryUseCases();
 
 router.post("/", 
-    schemaValidator("category"),
+    schemaValidator("/categories"),
     async (req: Request, res: Response) => {
         const category = req.body;
         res.status(201).send(await categoryUseCases.addCategory(category));
@@ -15,7 +15,7 @@ router.post("/",
 );
 
 router.put("/", 
-    schemaValidator("category"),
+    schemaValidator("/categories"),
     (req: Request, res: Response) => {
         const category = req.body;
         res.status(200).send(categoryUseCases.editCategory(category));

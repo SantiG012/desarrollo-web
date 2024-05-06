@@ -7,7 +7,7 @@ const router = Router();
 const wordUseCases:WordUseCases = new WordUseCases();
 
 router.post("/", 
-    schemaValidator("word"),
+    schemaValidator("/words"),
     async (req: Request, res: Response) => {
         const word = req.body;
         res.status(201).send(await wordUseCases.addWord(word));
@@ -15,7 +15,7 @@ router.post("/",
 );
 
 router.put("/", 
-    schemaValidator("word"),
+    schemaValidator("/words"),
     (req: Request, res: Response) => {
         const word = req.body;
         res.status(200).send(wordUseCases.editWord(word));

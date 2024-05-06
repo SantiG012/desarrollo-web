@@ -7,7 +7,7 @@ const router = Router();
 const wordsByCategoryUseCases:WordsByCategoryUseCases = new WordsByCategoryUseCases();
 
 router.post("/", 
-    schemaValidator("wordsByCategory"),
+    schemaValidator("/words-by-category"),
     async (req: Request, res: Response) => {
         const wordsByCategory = req.body;
         res.status(201).send(await wordsByCategoryUseCases.associateWordWithCategory(wordsByCategory));
@@ -15,7 +15,7 @@ router.post("/",
 );
 
 router.delete("/",
-    schemaValidator("wordsByCategory"),
+    schemaValidator("/words-by-category"),
     async (req: Request, res: Response) => {
        const wordsByCategory = req.body;
        res.status(200).send(await wordsByCategoryUseCases.disassociateWordWithCategory(wordsByCategory));
