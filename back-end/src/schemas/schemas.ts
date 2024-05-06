@@ -13,7 +13,7 @@ const categorySchema: ObjectSchema = Joi.object().keys({
 const wordsByCategorySchema: ObjectSchema = Joi.object().keys({
     id: Joi.number().required(),
     category: categorySchema.required(),
-    word: Joi.array().items(wordSchema).required(),
+    word: wordSchema.required(),
 });
 
 const playRoomSchema: ObjectSchema = Joi.object().keys({
