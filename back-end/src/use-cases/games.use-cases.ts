@@ -66,6 +66,10 @@ export class GameUseCases {
 
         if(player.playRoomId != roomId){throw new ApiError(`El id de la sala de juegos id=${roomId} con coincide con el id=${player.playRoomId}`,StatusCodes.BadRequest)}
 
+        const wordsByCategoryDb = await this.wordsByCategoryRepository.get({where:{category:playRoomDb.category}});
+        
+        if(wordsByCategoryDb.length === 0){throw new ApiError(`No hay palabras para la categoría ${playRoomDb.category.name}`,StatusCodes.BadRequest)}
+
         if(playRoomDb.state === PlayRoomStatus.Waiting){playRoomDb.state = PlayRoomStatus.Active; await this.playRoomRepository.update(playRoomDb)}
 
         const wordsByCategory = await this.wordsByCategoryRepository.get({where:{category:playRoomDb.category}, relations:{word:true}})
