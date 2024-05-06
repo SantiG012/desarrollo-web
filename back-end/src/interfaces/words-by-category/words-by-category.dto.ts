@@ -1,4 +1,4 @@
-export interface WordsByCategory {
+export interface WordsByCategoryDto {
     id:number;
     wordId:number;
     categoryId:number;
