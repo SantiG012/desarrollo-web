@@ -57,6 +57,10 @@ module.exports = (expressWs:any) =>{
     
             ws.on(WebScoketEventTypes.Close,async function(){
                 if(gameUseCases.isGameOver(roomId)){await gameUseCases.changeRoomStatus(roomId);return;}
+
+                const message = `${player.name} ha abandonado la partida, la sala se cerrará.`;
+                await gameUseCases.send(message,player.ws,roomId);
+                await gameUseCases.closeConnections(roomId);
             })
         } catch(error:ApiError | any){
             ws.send(JSON.stringify({status:error.statusCode,message:error.message}));
