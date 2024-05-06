@@ -2,6 +2,7 @@ import { StatusCodes } from "../Enums/status-codes.enum";
 import { ApiError } from "../Errors";
 import { AppDataSource } from "../data-source";
 import { Category, Word, WordsByCategory } from "../entities";
+import { WordsByCategoryDto } from "../interfaces";
 import { GenericRepository } from "../repositories/common";
 
 export class WordsByCategoryUseCases {
@@ -15,9 +16,9 @@ export class WordsByCategoryUseCases {
         this.categoryRepository = new GenericRepository<Category>(AppDataSource.getRepository(Category));
     }
 
-    public async associateWordWithCategory(wordsByCategory:WordsByCategory):Promise<WordsByCategory>{
-        const wordId = wordsByCategory.word.id;
-        const categoryId = wordsByCategory.category.id;
+    public async associateWordWithCategory(wordsByCategoryDto:WordsByCategoryDto):Promise<WordsByCategory>{
+        const wordId = wordsByCategoryDto.wordId;
+        const categoryId = wordsByCategoryDto.categoryId;
 
         const wordDb = await this.wordRepository.getOneBy({id:wordId});
 
@@ -27,15 +28,20 @@ export class WordsByCategoryUseCases {
 
         if(!categoryDb) { throw new ApiError(`La categoría con id=${categoryId} no existe`, StatusCodes.BadRequest)}
 
+        const wordsByCategory:WordsByCategory = {id:0,
+            word:wordDb,
+            category:categoryDb
+        }
+
         return await this.wordsByCategoryRepository.create(wordsByCategory);
     }
 
-    public async disassociateWordWithCategory(wordsByCategory:WordsByCategory):Promise<void>{
+    public async disassociateWordWithCategory(id:number):Promise<void>{
         
-        const wordsByCategoryDb = await this.wordsByCategoryRepository.getOneBy({category:wordsByCategory.category, word:wordsByCategory.word});
+        const wordsByCategoryDb = await this.wordsByCategoryRepository.getOneBy({id});
 
-        if (!wordsByCategoryDb){throw new ApiError(`La palabra ${wordsByCategory.word.text} no está asociada con la categoría ${wordsByCategory.category.name}`, StatusCodes.BadRequest)}
+        if (!wordsByCategoryDb){throw new ApiError(`La asociación con id=${id} no existe`, StatusCodes.BadRequest)}
 
-        return await this.wordsByCategoryRepository.delete(wordsByCategory.id);
+        return await this.wordsByCategoryRepository.delete(wordsByCategoryDb.id);
     }
 }
