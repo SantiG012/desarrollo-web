@@ -32,9 +32,9 @@ export class PlayRoomUseCases {
         return playRooms;
     }
 
-    public async createPlayRoom(playRoom:PlayRooms):Promise<PlayRooms>{
+    public async createPlayRoom(playRoom:any):Promise<PlayRooms>{
         const name = playRoom.name;
-        const categoryId = playRoom.category.id;
+        const categoryId = playRoom.categoryId;
         const playRoomDb = await this.playRoomRepository.getOneBy({name});
         const categoryDb = await this.categoryRepository.getOneBy({id:categoryId})
 
