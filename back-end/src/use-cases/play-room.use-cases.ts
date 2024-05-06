@@ -41,6 +41,7 @@ export class PlayRoomUseCases {
         if(playRoomDb){throw new ApiError(`La sala de juegos con el nombre ${name} ya existe`,StatusCodes.BadRequest)}
         if(!categoryDb){throw new ApiError(`La categoría con id=${categoryId} no existe`, StatusCodes.BadRequest)}
 
+        playRoom.category = categoryDb;
         return await this.playRoomRepository.create(playRoom);
     }
 
