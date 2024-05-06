@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import schemaValidator from "../middleware/schema.validator";
 import { WordUseCases } from "../use-cases";
 
@@ -8,24 +8,39 @@ const wordUseCases:WordUseCases = new WordUseCases();
 
 router.post("/", 
     schemaValidator("/words"),
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response, next:NextFunction) => {
         const word = req.body;
-        res.status(201).send(await wordUseCases.addWord(word));
+
+        try {
+            res.status(201).send(await wordUseCases.addWord(word));
+        } catch (error) {
+            next(error);
+        }
     }
 );
 
 router.put("/", 
     schemaValidator("/words"),
-    (req: Request, res: Response) => {
+    async (req: Request, res: Response, next:NextFunction) => {
         const word = req.body;
-        res.status(200).send(wordUseCases.editWord(word));
+        try {
+            res.status(200).send(await wordUseCases.editWord(word));
+        } catch (error) {
+            next(error);
+        }
     }   
 );
 
 router.delete("/:id",
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response, next:NextFunction) => {
         const id = parseInt(req.params.id);
-        res.status(200).send(await wordUseCases.deleteWord(id));
+
+        try {
+            res.status(200).send(await wordUseCases.deleteWord(id));
+        }catch (error) {
+            next(error);
+        }
+        
     }
 );
 
