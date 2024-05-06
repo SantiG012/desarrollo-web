@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import schemaValidator from "../middleware/schema.validator";
 import { WordsByCategoryUseCases } from "../use-cases";
 
@@ -8,17 +8,27 @@ const wordsByCategoryUseCases:WordsByCategoryUseCases = new WordsByCategoryUseCa
 
 router.post("/", 
     schemaValidator("/words-by-category"),
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response, next:NextFunction) => {
         const wordsByCategory = req.body;
-        res.status(201).send(await wordsByCategoryUseCases.associateWordWithCategory(wordsByCategory));
+
+        try{
+            res.status(201).send(await wordsByCategoryUseCases.associateWordWithCategory(wordsByCategory));
+        } catch (error) {
+            next(error);
+        }
+        
     }
 );
 
 router.delete("/",
     schemaValidator("/words-by-category"),
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response,next:NextFunction) => {
        const wordsByCategory = req.body;
-       res.status(200).send(await wordsByCategoryUseCases.disassociateWordWithCategory(wordsByCategory));
+       try{
+        res.status(201).send(await wordsByCategoryUseCases.disassociateWordWithCategory(wordsByCategory));
+    } catch (error) {
+        next(error);
+    }
     }
 );
 
