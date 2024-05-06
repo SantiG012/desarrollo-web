@@ -17,10 +17,10 @@ export class PlayRoomUseCases {
     }
 
     public async getPlayRoomsWords(id:number):Promise<string[]>{
-        const playRoomDb = await this.playRoomRepository.getOneBy({id});
-        if(!playRoomDb){throw new ApiError(`La sala de juegos con id=${id} no existe`,StatusCodes.BadRequest)}
+        const playRoomDb = await this.playRoomRepository.get({where:{id}, relations:{category:true}});
+        if(!playRoomDb[0]){throw new ApiError(`La sala de juegos con id=${id} no existe`,StatusCodes.BadRequest)}
 
-        const categoryId = playRoomDb.category.id;
+        const categoryId = playRoomDb[0].category.id;
 
         const wordsByCategory = await this.wordsByCategoryRepository.get({where:{category:{id:categoryId}}, relations:{word:true}});
 
