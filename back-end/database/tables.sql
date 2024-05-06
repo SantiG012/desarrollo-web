@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS sala_de_juego (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100),
     id_categoria INT,
-    estado VARCHAR(20),
+    estado VARCHAR(20) DEFAULT 'waiting',
     FOREIGN KEY (id_categoria) REFERENCES categoria(id)  ON DELETE CASCADE,
     UNIQUE (nombre)
 );
