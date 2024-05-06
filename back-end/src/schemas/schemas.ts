@@ -17,6 +17,7 @@ const wordsByCategorySchema: ObjectSchema = Joi.object().keys({
 });
 
 const playRoomSchema: ObjectSchema = Joi.object().keys({
+    id: Joi.number().required(),
     name: Joi.string().required().max(100),
     state: Joi.string().required().max(20),
     categoryId: Joi.number().required(),
