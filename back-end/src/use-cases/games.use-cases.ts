@@ -37,8 +37,11 @@ export class GameUseCases {
         if(player.playRoomId != playRoomId){throw new ApiError(`El id de la sala de juegos id=${playRoomId} con coincide con el id=${player.playRoomId}`,StatusCodes.BadRequest)}
 
         const roomPlayers:Player[] = this.roomsInfo[playRoomId]["roomPlayers"];
-    
-        if(!roomPlayers.includes(player)){roomPlayers.push(player);}
+        const roomPlayer:Player | undefined = roomPlayers.find((roomPlayer:Player)=>roomPlayer.id === player.id )
+
+        if(roomPlayer){throw new ApiError(`El jugador con id=${roomPlayer.id} ya está en la sala de juego`,StatusCodes.BadRequest)}
+
+        roomPlayers.push(player);
     }
 
     public async send(message:any,ws:any,playRoomId:number):Promise<void>{
