@@ -217,5 +217,18 @@ export class GameUseCases {
     public hasSelectedPlayer(roomId:number):boolean{
         return this.roomsInfo[roomId]["player"] !== undefined;
     }
+
+    public generateNewUser(userId:string,name:string, avatar:string,playRoomId:number):Player{
+        const score:number = 1;
+
+        return{
+            id:userId,
+            playRoomId,
+            name,
+            avatar,
+            ws:undefined,
+            score
+        }
+    }
     
 }
