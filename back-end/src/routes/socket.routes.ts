@@ -16,7 +16,8 @@ module.exports = (expressWs:any) =>{
     router.ws('/room/:roomId',async (ws:any,req:any, next:NextFunction)=>{
         try{
             const roomId:number =  parseInt(req.params.roomId);
-            const player:Player = JSON.parse(req.headers['player']);
+            const {userId,name, avatar} = req.query;
+            const player:Player = gameUseCases.generateNewPlayer(userId, name, avatar, roomId);
             player.ws = ws;
     
     
