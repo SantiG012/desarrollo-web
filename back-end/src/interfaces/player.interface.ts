@@ -5,6 +5,6 @@ export interface Player {
     playRoomId:number;
     name:string;
     avatar:string;
-    ws:WebSocket;
+    ws:WebSocket | undefined;
     score:number;
 }
