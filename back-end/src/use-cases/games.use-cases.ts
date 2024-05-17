@@ -58,6 +58,7 @@ export class GameUseCases {
         if(!roomPlayers) {return;}
         
         roomPlayers.forEach((player:Player)=>{
+            if(!player.ws){return;}
             if (player.ws !== ws && player.ws.readyState === 1) {
                 player.ws.send(message);
             }
@@ -161,6 +162,7 @@ export class GameUseCases {
 
         const promises: Promise<void>[] = players.map((player: Player) => {
             return new Promise<void>(() => {
+                if (!player.ws) { return; }
                 player.ws.close();
             });
         });
@@ -179,11 +181,12 @@ export class GameUseCases {
 
         const promises: Promise<void>[] = players.map((player: Player) => {
             return new Promise<void>((resolve, reject) => {
-                player.ws.send(`El juego terminó. Los resultados son: ${JSON.stringify(results)}`, (error: Error | null) => {
+                if (!player.ws) { return; }
+                player.ws.send(`El juego terminó. Los resultados son: ${JSON.stringify(results)}`, (error: any) => {
                     if (error) {
-                        reject(error); // If there's an error in sending the message
+                        reject(error);
                     } else {
-                        resolve(); // If the message is sent successfully
+                        resolve();
                     }
                 });
             });
