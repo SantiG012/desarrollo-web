@@ -7,6 +7,7 @@ export class WebSocketUseCases {
 
     public handleChatMessages(players:Player[], message:string):void{
         players.forEach(player=>{
+            if(!player.ws){return;}
             player.ws.send(message);
         });
     }
