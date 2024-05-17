@@ -3,3 +3,4 @@ export * from './category.use-cases';
 export * from './words-by-category.use-cases';
 export * from './games.use-cases';
 export * from './play-room.use-cases';
+export * from './web-socket.use-cases';
