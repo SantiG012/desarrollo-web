@@ -1,4 +1,5 @@
 export enum WebScoketEventTypes{
     Message = 'message',
-    Close = 'close'
+    Close = 'close',
+    ChatMessage = 'CHAT_MESSAGE',
 }
