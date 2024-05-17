@@ -9,14 +9,21 @@ const socket = new WebSocket(`ws://localhost:3000/ws/room/1?userId=${userId}&nam
 
 sendButton.addEventListener("click",(e)=>{
     e.preventDefault();
-    sendMessage();
+    sendMessage(EventType.CHAT_MESSAGE);
     textBox.value = "";
 });
 
-function sendMessage(){
+function sendMessage(eventType){
     const message = textBox.value
-    socket.send(message);
+    socket.send(JSON.stringify({
+        eventType,
+        payload: {
+            message,
+        }
+    }));
 }
+
+
 
 
 
@@ -25,7 +32,7 @@ socket.onopen = function(event) {
 };
 
 socket.onmessage = function(event) {
-    console.log("Message received:", event.data);
+    console.log("WebSocket message received:", event.data);
 };
 
 socket.onerror = function(error) {
