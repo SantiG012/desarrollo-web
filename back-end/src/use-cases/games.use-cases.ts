@@ -48,6 +48,12 @@ export class GameUseCases {
         roomPlayers.push(player);
     }
 
+    public candSendMessages(player:Player, roomId:number):boolean{
+        if (this.isDrawing(player, roomId)) { return false; }
+        if (this.alreadyWon(player, roomId)) { return false; }
+        return true;
+    }
+
     public async send(message:any,ws:any,playRoomId:number):Promise<void>{
         const playRoomDb = await this.playRoomRepository.getOneBy({id:playRoomId})
 
@@ -142,11 +148,11 @@ export class GameUseCases {
         player.score += (score* Math.abs(playerPosition-5));
     }
 
-    public isDrawing(player:Player,roomId:number):boolean{
+    private isDrawing(player:Player,roomId:number):boolean{
         return this.roomsInfo[roomId]["player"]===player;
     }
 
-    public alreadyWon(player:Player, roomId:number):boolean{
+    private alreadyWon(player:Player, roomId:number):boolean{
         return this.roomsInfo[roomId]["guessOrdering"].includes(player);
     }
 
