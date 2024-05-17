@@ -1,8 +1,10 @@
+import { WebSocket } from 'ws';
+
 export interface Player {
     id:string;
     playRoomId:number;
     name:string;
     avatar:string;
-    ws:any;
+    ws:WebSocket;
     score:number;
 }
