@@ -37,9 +37,13 @@ export class GameUseCases {
         if(player.playRoomId != playRoomId){throw new ApiError(`El id de la sala de juegos id=${playRoomId} con coincide con el id=${player.playRoomId}`,StatusCodes.BadRequest)}
 
         const roomPlayers:Player[] = this.roomsInfo[playRoomId]["roomPlayers"];
-        const roomPlayer:Player | undefined = roomPlayers.find((roomPlayer:Player)=>roomPlayer.id === player.id )
+        const roomPlayerById:Player | undefined = roomPlayers.find((roomPlayer:Player)=>roomPlayer.id === player.id );
+        const roomPlayerByName:Player | undefined = roomPlayers.find((roomPlayer:Player)=>roomPlayer.name === player.name );
+        const roomPlayerByAvatar:Player | undefined = roomPlayers.find((roomPlayer:Player)=>roomPlayer.avatar === player.avatar );
 
-        if(roomPlayer){throw new ApiError(`El jugador con id=${roomPlayer.id} ya está en la sala de juego`,StatusCodes.BadRequest)}
+        if(roomPlayerById){throw new ApiError(`El jugador con id=${roomPlayerById.id} ya está en la sala de juego`,StatusCodes.BadRequest)}
+        if(roomPlayerByName){throw new ApiError(`El jugador con nombre=${roomPlayerByName.name} ya está en la sala de juego`,StatusCodes.BadRequest)}
+        if(roomPlayerByAvatar){throw new ApiError(`El jugador con avatar=${roomPlayerByAvatar.avatar} ya está en la sala de juego`,StatusCodes.BadRequest)}
 
         roomPlayers.push(player);
     }
@@ -222,6 +226,8 @@ export class GameUseCases {
     }
 
     public generateNewPlayer(userId:string,name:string, avatar:string,playRoomId:number):Player{
+        if(!userId || !name || !avatar){throw new ApiError("El jugador debe tener un id, nombre y avatar",StatusCodes.BadRequest);}
+
         const score:number = 1;
         const ws = undefined;
 
