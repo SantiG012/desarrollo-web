@@ -1,9 +1,9 @@
 import { NextFunction, Router } from "express";
-import { GameUseCases } from "../use-cases/games.use-cases";
 import { Player } from "../interfaces";
 import { WebScoketEventTypes } from "../Enums/ws-events-types.enum";
 import { PlayRoomStatus } from "../Enums/play-room-status.enum";
 import { ApiError } from "../Errors";
+import { WebSocketUseCases, GameUseCases } from "../use-cases";
 
 const express = require('express');
 const router = express.Router();
@@ -12,6 +12,7 @@ module.exports = (expressWs:any) =>{
     expressWs.applyTo(router);
 
     const gameUseCases = new GameUseCases();
+    const webSocketUseCases = new WebSocketUseCases();
 
     router.ws('/room/:roomId',async (ws:any,req:any, next:NextFunction)=>{
         try{
@@ -30,10 +31,11 @@ module.exports = (expressWs:any) =>{
     
             if(gameUseCases.hasEnoughPlayers(roomId) && !gameUseCases.hasSelectedPlayer(roomId)){gameUseCases.startGame(roomId);}
         
-            ws.on(WebScoketEventTypes.Message, async function (message:string){
-                if(gameUseCases.isDrawing(player,roomId)){return;}
-    
-                if(gameUseCases.alreadyWon(player, roomId)){return;}
+            ws.on(WebScoketEventTypes.Message, async function (message:any){
+                switch(message){
+                    case WebScoketEventTypes.Message:
+                        if (!gameUseCases.candSendMessages(player, roomId)){return;}
+
     
                 if(!gameUseCases.wordGuessed(roomId,message)){await gameUseCases.send(`${player.name}: ${message}`,ws,roomId);return;}
     
