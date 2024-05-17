@@ -4,6 +4,7 @@ import { WebScoketEventTypes } from "../Enums/ws-events-types.enum";
 import { PlayRoomStatus } from "../Enums/play-room-status.enum";
 import { ApiError } from "../Errors";
 import { WebSocketUseCases, GameUseCases } from "../use-cases";
+import { WebSocket } from "ws";
 
 const express = require('express');
 const router = express.Router();
@@ -14,7 +15,7 @@ module.exports = (expressWs:any) =>{
     const gameUseCases = new GameUseCases();
     const webSocketUseCases = new WebSocketUseCases();
 
-    router.ws('/room/:roomId',async (ws:any,req:any, next:NextFunction)=>{
+    router.ws('/room/:roomId',async (ws:WebSocket,req:any, next:NextFunction)=>{
         try{
             const roomId:number =  parseInt(req.params.roomId);
             const {userId,name, avatar} = req.query;
@@ -33,8 +34,11 @@ module.exports = (expressWs:any) =>{
         
             ws.on(WebScoketEventTypes.Message, async function (message:any){
                 switch(message){
-                    case WebScoketEventTypes.Message:
+                    case WebScoketEventTypes.ChatMessage:
+                        let message = `${player.name}: ${message}`;
                         if (!gameUseCases.candSendMessages(player, roomId)){return;}
+                    }
+
 
     
                 if(!gameUseCases.wordGuessed(roomId,message)){await gameUseCases.send(`${player.name}: ${message}`,ws,roomId);return;}
