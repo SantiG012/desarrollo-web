@@ -3,7 +3,7 @@ import { StatusCodes } from "../Enums/status-codes.enum";
 import { ApiError } from "../Errors";
 import { AppDataSource } from "../data-source";
 import { PlayRooms, WordsByCategory } from "../entities";
-import { Player } from "../interfaces";
+import { Player, ResultsPayload } from "../interfaces";
 import { GenericRepository } from "../repositories/common";
 
 export class GameUseCases {
@@ -56,6 +56,15 @@ export class GameUseCases {
 
     public getPlayers(roomId:number):Player[]{
         return this.roomsInfo[roomId]["roomPlayers"];
+    }
+
+    public getResults(roomId:number):ResultsPayload[]{
+        const results:ResultsPayload[] = this.roomsInfo[roomId]["roomPlayers"].map((player: Player) => ({
+            name: player.name,
+            score: player.score
+        }));
+
+        return results;
     }
 
     public handleGameOver(roomId:number):void{
