@@ -1,10 +1,12 @@
 import { NextFunction, Router } from "express";
-import { Player } from "../interfaces";
+import { ChatMessagePayload, Communication, Player, ResultsPayload } from "../interfaces";
 import { WebScoketEventTypes } from "../Enums/ws-events-types.enum";
 import { PlayRoomStatus } from "../Enums/play-room-status.enum";
 import { ApiError } from "../Errors";
 import { WebSocketUseCases, GameUseCases } from "../use-cases";
 import { WebSocket } from "ws";
+import schemaValidator from "../middleware/schema.validator";
+import { GameEventTypes } from "../Enums/game-event-types.enum";
 
 const express = require('express');
 const router = express.Router();
@@ -15,7 +17,9 @@ module.exports = (expressWs:any) =>{
     const gameUseCases = new GameUseCases();
     const webSocketUseCases = new WebSocketUseCases();
 
-    router.ws('/room/:roomId',async (ws:WebSocket,req:any, next:NextFunction)=>{
+    router.ws('/room/:roomId',
+    //TODO: Add schema validator
+    async (ws:WebSocket,req:any, next:NextFunction)=>{
         try{
             const roomId:number =  parseInt(req.params.roomId);
             const {userId,name, avatar} = req.query;
@@ -32,34 +36,43 @@ module.exports = (expressWs:any) =>{
     
             if(gameUseCases.hasEnoughPlayers(roomId) && !gameUseCases.hasSelectedPlayer(roomId)){gameUseCases.startGame(roomId);}
         
-            ws.on(WebScoketEventTypes.Message, async function (message:any){
-                switch(message){
-                    case WebScoketEventTypes.ChatMessage:
-                        let message = `${player.name}: ${message}`;
-                        if (!gameUseCases.candSendMessages(player, roomId)){return;}
+            ws.on(WebScoketEventTypes.Message, async function (communicationInterface:Communication){
+                const gameEventType = communicationInterface.gameEventType;
+                
+
+
+                switch(gameEventType){
+                    case GameEventTypes.CHAT_MESSAGE:
+                        const payload = communicationInterface.chatMessagePayload;
+                        let message = `${player.name}: ${payload?.message}`;
+                        const players:Player[] = gameUseCases.getPlayers(roomId);
+                        const chatMessagePayload:ChatMessagePayload = {message,senderId:player.id,senderName:player.name};
+                        const communication:Communication = {gameEventType:GameEventTypes.CHAT_MESSAGE,chatMessagePayload:chatMessagePayload};
+
+                        if (!gameUseCases.canSendMessages(player, roomId)){return;}
+
+                        if(!gameUseCases.wordGuessed(roomId,message)){ webSocketUseCases.handleMessages(players,communication);return;}
+                        
+                        chatMessagePayload.message = `${player.name} ha acertado la palabra!`;
+                        gameUseCases.updateScore(roomId,player);
+                        webSocketUseCases.handleMessages(players,communication);
+                            
+
+                        if(!gameUseCases.isGameOver(roomId)){return;}
+
+                        const resultsPayload:ResultsPayload[] = gameUseCases.getResults(roomId);
+
+                        communication.gameEventType = GameEventTypes.GAME_OVER;
+                        communication.resultsPayload = resultsPayload;
+
+                        webSocketUseCases.handleMessages(players,communication);
+
+                        webSocketUseCases.closeConnections(players);
+
+                        gameUseCases.handleGameOver(roomId);
+
+
                     }
-
-
-    
-                if(!gameUseCases.wordGuessed(roomId,message)){await gameUseCases.send(`${player.name}: ${message}`,ws,roomId);return;}
-    
-                gameUseCases.updateScore(roomId,player);
-    
-                const scoreMessage = `${player.name} ha acertado la palabra!`;
-    
-                gameUseCases.send(scoreMessage,undefined,roomId);
-    
-                if (!gameUseCases.allWon(roomId)){return;}
-    
-                if(gameUseCases.isGameOver(roomId)){
-                    await gameUseCases.sendResults(roomId);
-                    await gameUseCases.closeConnections(roomId);
-                    return;
-                }
-    
-                gameUseCases.deleteGuessedWord(roomId);
-    
-                gameUseCases.resetGame(roomId);
             })
     
             ws.on(WebScoketEventTypes.Close,async function(){
@@ -68,7 +81,7 @@ module.exports = (expressWs:any) =>{
                 const message = `${player.name} ha abandonado la partida, la sala se cerrará.`;
                 await gameUseCases.send(message,player.ws,roomId);
                 await gameUseCases.changeRoomStatus(roomId);
-                await gameUseCases.closeConnections(roomId);
+                //await gameUseCases.closeConnections(roomId);
             })
         } catch(error:ApiError | any){
             ws.send(JSON.stringify({status:error.statusCode,message:error.message}));
