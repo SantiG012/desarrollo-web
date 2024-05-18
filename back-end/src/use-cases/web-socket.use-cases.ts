@@ -12,4 +12,11 @@ export class WebSocketUseCases {
         });
     }
 
+    public closeConnections(players:Player[]):void{
+        players.forEach(player=>{
+            if(!player.ws){return;}
+            player.ws.close();
+        });
+    }
+
 }
