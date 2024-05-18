@@ -137,14 +137,14 @@ export class GameUseCases {
         this.send(`Es el turno de ${player.name}`,player.ws,roomId);
     }
 
-    public resetGame(roomId:number):void{
+    private resetGame(roomId:number):void{
         this.roomsInfo[roomId]["guessOrdering"] = [];
         const wordsLength =  this.roomsInfo[roomId]["roomWords"].length
         this.roomsInfo[roomId]["wordIndex"] = Math.floor(Math.random() * wordsLength);
         this.startGame(roomId);
     }
 
-    public deleteGuessedWord(roomId:number):void{
+    private deleteGuessedWord(roomId:number):void{
         this.roomsInfo[roomId]["roomWords"].splice(this.roomsInfo[roomId]["wordIndex"],1);
     }
 
