@@ -58,6 +58,11 @@ export class GameUseCases {
         return this.roomsInfo[roomId]["roomPlayers"];
     }
 
+    public handleGameOver(roomId:number):void{
+        this.deleteGuessedWord(roomId);
+        this.resetGame(roomId);
+    }
+
     public async send(message:any,ws:any,playRoomId:number):Promise<void>{
         const playRoomDb = await this.playRoomRepository.getOneBy({id:playRoomId})
 
@@ -141,6 +146,7 @@ export class GameUseCases {
 
     public isGameOver(roomId:number):boolean{
         const wordsLength =  this.roomsInfo[roomId]["roomWords"].length;
+        if(!this.allWon(roomId)){return false;}
         return wordsLength === 1;
     }
 
