@@ -48,7 +48,7 @@ export class GameUseCases {
         roomPlayers.push(player);
     }
 
-    public candSendMessages(player:Player, roomId:number):boolean{
+    public canSendMessages(player:Player, roomId:number):boolean{
         if (this.isDrawing(player, roomId)) { return false; }
         if (this.alreadyWon(player, roomId)) { return false; }
         return true;
