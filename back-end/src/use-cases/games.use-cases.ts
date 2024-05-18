@@ -54,6 +54,10 @@ export class GameUseCases {
         return true;
     }
 
+    public getPlayers(roomId:number):Player[]{
+        return this.roomsInfo[roomId]["roomPlayers"];
+    }
+
     public async send(message:any,ws:any,playRoomId:number):Promise<void>{
         const playRoomDb = await this.playRoomRepository.getOneBy({id:playRoomId})
 
