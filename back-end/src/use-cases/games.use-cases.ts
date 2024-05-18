@@ -182,51 +182,6 @@ export class GameUseCases {
         return winners === (roomPlayers-1);
     }
 
-    public async closeConnections(roomId:number):Promise<void[]>{
-        const players:Player[] = this.roomsInfo[roomId]["roomPlayers"];
-
-        const promises: Promise<void>[] = players.map((player: Player) => {
-            return new Promise<void>(() => {
-                if (!player.ws) { return; }
-                player.ws.close();
-            });
-        });
-
-        return await Promise.all(promises);
-    }
-
-    public async sendResults(roomId:number):Promise<void>{
-        const results = this.roomsInfo[roomId]["roomPlayers"].map((player: Player) => ({
-            "nombre": player.name,
-            "puntos": player.score
-        }));
-        
-        const players:Player[] = this.roomsInfo[roomId]["roomPlayers"];
-
-
-        const promises: Promise<void>[] = players.map((player: Player) => {
-            return new Promise<void>((resolve, reject) => {
-                if (!player.ws) { return; }
-                player.ws.send(`El juego terminó. Los resultados son: ${JSON.stringify(results)}`, (error: any) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve();
-                    }
-                });
-            });
-        });
-        
-        // Wait for all promises to resolve
-        Promise.all(promises)
-            .then(() => {
-                console.log("All messages sent successfully.");
-            })
-            .catch((error) => {
-                console.error("Error sending messages:", error);
-            });
-        
-    }
 
     public async changeRoomStatus(roomId:number):Promise<void>{
         this.roomsInfo[roomId]["roomPlayers"] = [];
