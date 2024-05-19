@@ -32,6 +32,8 @@ module.exports = (expressWs:any) =>{
                 const gameEventType = communicationInterface.gameEventType;
                 let players:Player[];
                 let message:string;
+                let roundInfo:RoundInfo;
+                let communication:Communication;
                 
 
 
@@ -41,7 +43,7 @@ module.exports = (expressWs:any) =>{
                         message = `${player.name}: ${payload?.message}`;
                         players = gameUseCases.getPlayers(roomId);
                         const chatMessagePayload:ChatMessagePayload = {message,senderId:player.id,senderName:player.name};
-                        const communication:Communication = {gameEventType:GameEventTypes.CHAT_MESSAGE,chatMessagePayload:chatMessagePayload};
+                        communication = {gameEventType:GameEventTypes.CHAT_MESSAGE,chatMessagePayload:chatMessagePayload};
 
                         if (!gameUseCases.canSendMessages(player, roomId)){return;}
 
@@ -50,24 +52,39 @@ module.exports = (expressWs:any) =>{
                         chatMessagePayload.message = `${player.name} ha acertado la palabra!`;
                         gameUseCases.updateScore(roomId,player);
                         webSocketUseCases.handleMessages(players,communication);
-                            
 
-                        if(!gameUseCases.isGameOver(roomId)){return;}
 
-                        //TODO: Handle round over
+                        if(gameUseCases.isGameOver(roomId)){
+                            const resultsPayload:ResultsPayload[] = gameUseCases.getResults(roomId);
 
-                        const resultsPayload:ResultsPayload[] = gameUseCases.getResults(roomId);
+                            communication.gameEventType = GameEventTypes.GAME_OVER;
+                            communication.resultsPayload = resultsPayload;
+    
+                            webSocketUseCases.handleMessages(players,communication);
+    
+                            webSocketUseCases.closeConnections(players);
+    
+                            gameUseCases.handleGameOver(roomId);
+                            return;
+                        }
 
-                        communication.gameEventType = GameEventTypes.GAME_OVER;
-                        communication.resultsPayload = resultsPayload;
+                        if(!gameUseCases.isRoundOver(roomId)){return;}
 
-                        webSocketUseCases.handleMessages(players,communication);
+                        gameUseCases.handleRoundOver(roomId);
+                        roundInfo = gameUseCases.getRoundInfo(roomId);
 
-                        webSocketUseCases.closeConnections(players);
+                        message = `La palabra a adivinar es: ${roundInfo.word}`;
 
-                        gameUseCases.handleGameOver(roomId);
+                        communication.gameEventType = GameEventTypes.ROUND_NOTIFICATION;
+                        communication.roundNotificationPayload = {message,roundInfo};
 
-                        //TODO: 
+                        webSocketUseCases.handleMessages([roundInfo.playerInTurn],communication);
+
+                        message = `Es el turno de ${roundInfo.playerInTurn.name}`;
+
+                        communication.roundNotificationPayload.message = message;
+
+                        webSocketUseCases.handleMessages(roundInfo.guessers,communication);
 
                     case GameEventTypes.JOIN_GAME:
                         const joinCommunication:Communication = {gameEventType:GameEventTypes.CHAT_MESSAGE,chatMessagePayload:undefined};
@@ -78,7 +95,7 @@ module.exports = (expressWs:any) =>{
 
                         gameUseCases.startGame(roomId);
 
-                        const roundInfo:RoundInfo = gameUseCases.getRoundInfo(roomId);
+                        roundInfo = gameUseCases.getRoundInfo(roomId);
 
                         message = `La palabra a adivinar es: ${roundInfo.word}`;
 
