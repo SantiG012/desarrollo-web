@@ -96,7 +96,6 @@ module.exports = (expressWs:any) =>{
 
 
                     case GameEventTypes.JOIN_GAME:{
-                        console.log('Join game');
                         communication.gameEventType = GameEventTypes.ROUND_NOTIFICATION;
                         
                         await gameUseCases.handleNewPlayer(player,roomId);
