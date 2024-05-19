@@ -5,6 +5,7 @@ import { AppDataSource } from "../data-source";
 import { PlayRooms, WordsByCategory } from "../entities";
 import { Player, ResultsPayload, RoundInfo } from "../interfaces";
 import { GenericRepository } from "../repositories/common";
+import { WebSocket } from "ws";
 
 export class GameUseCases {
     private playRoomRepository:GenericRepository<PlayRooms>;
@@ -162,12 +163,14 @@ export class GameUseCases {
         this.roomsInfo[roomId]["roomWords"].splice(this.roomsInfo[roomId]["wordIndex"],1);
     }
 
-    public getRoundInfo(roomId:number):RoundInfo{
+    public getRoundInfo(roomId:number):{roundInfo:RoundInfo, playersWs:WebSocket[]}{
         const word:string = this.roomsInfo[roomId]["roomWords"][this.roomsInfo[roomId]["wordIndex"]];
         const playerInTurn:Player = this.roomsInfo[roomId]["player"];
         const guessers:Player[] = this.roomsInfo[roomId]["roomPlayers"].filter((player:Player)=>player.id !== playerInTurn.id);
+        const playersWs:WebSocket[] = guessers.map((player:Player)=>player.ws);
+        const roundInfo:RoundInfo = {playerInTurn,guessers,word};
 
-        return {playerInTurn,guessers,word};
+        return {roundInfo:roundInfo, playersWs};
     }
 
     public wordGuessed(roomId:number, userAttempt:string):boolean{
@@ -225,11 +228,10 @@ export class GameUseCases {
         return;
     }
 
-    public generateNewPlayer(userId:string,name:string, avatar:string,playRoomId:number):Player{
+    public generateNewPlayer(userId:string,name:string, avatar:string,playRoomId:number,ws:WebSocket):Player{
         if(!userId || !name || !avatar){throw new ApiError("El jugador debe tener un id, nombre y avatar",StatusCodes.BadRequest);}
 
         const score:number = 1;
-        const ws = undefined;
 
         return{
             id:userId,

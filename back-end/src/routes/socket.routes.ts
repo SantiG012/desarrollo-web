@@ -23,8 +23,7 @@ module.exports = (expressWs:any) =>{
         try{
             const roomId:number =  parseInt(req.params.roomId);
             const {userId,name, avatar} = req.query;
-            const player:Player = gameUseCases.generateNewPlayer(userId, name, avatar, roomId);
-            player.ws = ws;
+            const player:Player = gameUseCases.generateNewPlayer(userId, name, avatar, roomId,ws);
     
     
         
@@ -70,7 +69,8 @@ module.exports = (expressWs:any) =>{
                         if(!gameUseCases.isRoundOver(roomId)){return;}
 
                         gameUseCases.handleRoundOver(roomId);
-                        roundInfo = gameUseCases.getRoundInfo(roomId);
+
+                        let {roundInfo, playersWs} = gameUseCases.getRoundInfo(roomId);
 
                         message = `La palabra a adivinar es: ${roundInfo.word}`;
 
@@ -93,7 +93,7 @@ module.exports = (expressWs:any) =>{
                         console.log('Join game');
                         communication.gameEventType = GameEventTypes.ROUND_NOTIFICATION;
                         
-                        gameUseCases.handleNewPlayer(player,roomId);
+                        await gameUseCases.handleNewPlayer(player,roomId);
                         
                         if(!gameUseCases.gameCanStart(roomId)){
                             message = 'Esperando a que se unan más jugadores...'
@@ -104,12 +104,12 @@ module.exports = (expressWs:any) =>{
 
                         gameUseCases.startGame(roomId);
 
-                        roundInfo = gameUseCases.getRoundInfo(roomId);
+                        let {roundInfo, playersWs} = gameUseCases.getRoundInfo(roomId);
 
                         message = `La palabra a adivinar es: ${roundInfo.word}`;
 
                         communication.roundNotificationPayload = {message,roundInfo};
-
+                        
                         webSocketUseCases.handleMessages([roundInfo.playerInTurn],communication);
 
                         message = `Es el turno de ${roundInfo.playerInTurn.name}`;
