@@ -170,6 +170,17 @@ export class GameUseCases {
         return word.toUpperCase() === userAttempt.toUpperCase();
     }
 
+    public isRoundOver(roomId:number):boolean{
+        return this.allWon(roomId);
+    }
+
+    private allWon(roomId:number):boolean{
+        const winners = this.roomsInfo[roomId]["guessOrdering"].length;
+        const roomPlayers = this.roomsInfo[roomId]["roomPlayers"].length;
+
+        return winners === (roomPlayers-1);
+    }
+
     public isGameOver(roomId:number):boolean{
         const wordsLength =  this.roomsInfo[roomId]["roomWords"].length;
         if(!this.allWon(roomId)){return false;}
@@ -190,13 +201,6 @@ export class GameUseCases {
 
     private alreadyWon(player:Player, roomId:number):boolean{
         return this.roomsInfo[roomId]["guessOrdering"].includes(player);
-    }
-
-    public allWon(roomId:number):boolean{
-        const winners = this.roomsInfo[roomId]["guessOrdering"].length;
-        const roomPlayers = this.roomsInfo[roomId]["roomPlayers"].length;
-
-        return winners === (roomPlayers-1);
     }
 
 
