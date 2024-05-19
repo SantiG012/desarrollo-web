@@ -31,7 +31,7 @@ export class GameUseCases {
 
 
     public async handleNewPlayer(player:Player,playRoomId:number):Promise<void>{
-        if(!this.roomExists(playRoomId) || this.isRoomWaitingPlayers(playRoomId)){await this.initializeEmptyRoomWithOnePlayer(playRoomId,player);}
+        if(!this.roomExists(playRoomId) || this.isRoomWaitingPlayers(playRoomId)){await this.initializeEmptyRoomWithOnePlayer(playRoomId,player); return;}
 
         await this.joinPlayRoom(player,playRoomId);
     }
