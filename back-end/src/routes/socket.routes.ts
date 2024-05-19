@@ -33,7 +33,7 @@ module.exports = (expressWs:any) =>{
                 let players:Player[];
                 let message:string;
                 let roundInfo:RoundInfo;
-                let communication:Communication;
+                let communication:Communication = {gameEventType:GameEventTypes.CHAT_MESSAGE};
                 
 
 
@@ -64,7 +64,7 @@ module.exports = (expressWs:any) =>{
     
                             webSocketUseCases.closeConnections(players);
     
-                            gameUseCases.handleGameOver(roomId);
+                            gameUseCases.handleGameOver(roomId); // TODO: Check if this is necessary
                             return;
                         }
 
@@ -87,11 +87,16 @@ module.exports = (expressWs:any) =>{
                         webSocketUseCases.handleMessages(roundInfo.guessers,communication);
 
                     case GameEventTypes.JOIN_GAME:
-                        const joinCommunication:Communication = {gameEventType:GameEventTypes.CHAT_MESSAGE,chatMessagePayload:undefined};
-
+                        communication.gameEventType = GameEventTypes.ROUND_NOTIFICATION;
+                        
                         gameUseCases.handleNewPlayer(player,roomId);
                         
-                        if(!gameUseCases.gameCanStart(roomId)){return;}
+                        if(!gameUseCases.gameCanStart(roomId)){
+                            message = 'Esperando a que se unan más jugadores...'
+                            communication.roundNotificationPayload = {message, roundInfo:undefined};
+                            webSocketUseCases.handleMessages([player],communication);
+                            return;
+                        }
 
                         gameUseCases.startGame(roomId);
 
@@ -99,16 +104,15 @@ module.exports = (expressWs:any) =>{
 
                         message = `La palabra a adivinar es: ${roundInfo.word}`;
 
-                        joinCommunication.gameEventType = GameEventTypes.ROUND_NOTIFICATION;
-                        joinCommunication.roundNotificationPayload = {message,roundInfo};
+                        communication.roundNotificationPayload = {message,roundInfo};
 
-                        webSocketUseCases.handleMessages([roundInfo.playerInTurn],joinCommunication);
+                        webSocketUseCases.handleMessages([roundInfo.playerInTurn],communication);
 
                         message = `Es el turno de ${roundInfo.playerInTurn.name}`;
 
-                        joinCommunication.roundNotificationPayload.message = message;
+                        communication.roundNotificationPayload.message = message;
 
-                        webSocketUseCases.handleMessages(roundInfo.guessers,joinCommunication);
+                        webSocketUseCases.handleMessages(roundInfo.guessers,communication);
                         
 
 
