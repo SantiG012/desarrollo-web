@@ -1,7 +1,8 @@
 import { Player } from "./player.interface";
+import { SendPlayerInterface } from "./send-player.interface";
 
 export interface RoundInfo {
-    playerInTurn: Player;
-    guessers: Player[];
+    playerInTurn: SendPlayerInterface;
+    guessers: SendPlayerInterface[];
     word: string;
 }

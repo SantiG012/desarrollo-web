@@ -30,7 +30,9 @@ module.exports = (expressWs:any) =>{
             ws.on(WebScoketEventTypes.Message, async function (communicationInterface:Communication){
                 communicationInterface = JSON.parse(communicationInterface.toString());
                 const gameEventType = communicationInterface.gameEventType;
-                let players:Player[];
+                let roomPlayersWebsockets:WebSocket[];
+                let playerInTurnWebsocket:WebSocket;
+                let guessersWebsockets:WebSocket[];
                 let message:string;
                 let roundInfo:RoundInfo;
                 let communication:Communication = {gameEventType:GameEventTypes.CHAT_MESSAGE};
@@ -39,17 +41,17 @@ module.exports = (expressWs:any) =>{
                     case GameEventTypes.CHAT_MESSAGE:{
                         const payload = communicationInterface.chatMessagePayload;
                         message = `${player.name}: ${payload?.message}`;
-                        players = gameUseCases.getPlayers(roomId);
+                        roomPlayersWebsockets = gameUseCases.getPlayersWebSocket(roomId);
                         const chatMessagePayload:ChatMessagePayload = {message,senderId:player.id,senderName:player.name};
                         communication = {gameEventType:GameEventTypes.CHAT_MESSAGE,chatMessagePayload:chatMessagePayload};
 
                         if (!gameUseCases.canSendMessages(player, roomId)){return;}
 
-                        if(!gameUseCases.wordGuessed(roomId,message)){ webSocketUseCases.handleMessages(players,communication);return;}
+                        if(!gameUseCases.wordGuessed(roomId,message)){ webSocketUseCases.handleMessages(roomPlayersWebsockets,communication);return;}
                         
                         chatMessagePayload.message = `${player.name} ha acertado la palabra!`;
                         gameUseCases.updateScore(roomId,player);
-                        webSocketUseCases.handleMessages(players,communication);
+                        webSocketUseCases.handleMessages(roomPlayersWebsockets,communication);
 
 
                         if(gameUseCases.isGameOver(roomId)){
@@ -58,9 +60,9 @@ module.exports = (expressWs:any) =>{
                             communication.gameEventType = GameEventTypes.GAME_OVER;
                             communication.resultsPayload = resultsPayload;
     
-                            webSocketUseCases.handleMessages(players,communication);
+                            webSocketUseCases.handleMessages(roomPlayersWebsockets,communication);
     
-                            webSocketUseCases.closeConnections(players);
+                            webSocketUseCases.closeConnections(roomPlayersWebsockets);
     
                             gameUseCases.handleGameOver(roomId); // TODO: Check if this is necessary
                             return;
@@ -70,20 +72,24 @@ module.exports = (expressWs:any) =>{
 
                         gameUseCases.handleRoundOver(roomId);
 
-                        let {roundInfo, playersWs} = gameUseCases.getRoundInfo(roomId);
+                        roundInfo = gameUseCases.getRoundInfo(roomId);
 
                         message = `La palabra a adivinar es: ${roundInfo.word}`;
 
                         communication.gameEventType = GameEventTypes.ROUND_NOTIFICATION;
                         communication.roundNotificationPayload = {message,roundInfo};
 
-                        webSocketUseCases.handleMessages([roundInfo.playerInTurn],communication);
+                        playerInTurnWebsocket = gameUseCases.getPlayerInTurnWebSocket(roomId);
+                        
+                        webSocketUseCases.handleMessages([playerInTurnWebsocket],communication);
 
                         message = `Es el turno de ${roundInfo.playerInTurn.name}`;
 
                         communication.roundNotificationPayload.message = message;
 
-                        webSocketUseCases.handleMessages(roundInfo.guessers,communication);
+                        guessersWebsockets = gameUseCases.getGuessersWebSocket(roomId);
+
+                        webSocketUseCases.handleMessages(guessersWebsockets,communication);
 
                         break;
                     }
@@ -98,25 +104,29 @@ module.exports = (expressWs:any) =>{
                         if(!gameUseCases.gameCanStart(roomId)){
                             message = 'Esperando a que se unan más jugadores...'
                             communication.roundNotificationPayload = {message, roundInfo:undefined};
-                            webSocketUseCases.handleMessages([player],communication);
+                            webSocketUseCases.handleMessages([player.ws],communication);
                             return;
                         }
 
                         gameUseCases.startGame(roomId);
 
-                        let {roundInfo, playersWs} = gameUseCases.getRoundInfo(roomId);
+                        roundInfo = gameUseCases.getRoundInfo(roomId);
 
                         message = `La palabra a adivinar es: ${roundInfo.word}`;
 
                         communication.roundNotificationPayload = {message,roundInfo};
+
+                        playerInTurnWebsocket = gameUseCases.getPlayerInTurnWebSocket(roomId);
                         
-                        webSocketUseCases.handleMessages([roundInfo.playerInTurn],communication);
+                        webSocketUseCases.handleMessages([playerInTurnWebsocket],communication);
 
                         message = `Es el turno de ${roundInfo.playerInTurn.name}`;
 
                         communication.roundNotificationPayload.message = message;
 
-                        webSocketUseCases.handleMessages(roundInfo.guessers,communication);
+                        guessersWebsockets = gameUseCases.getGuessersWebSocket(roomId);
+
+                        webSocketUseCases.handleMessages(guessersWebsockets,communication);
                     
                         break;
                     }

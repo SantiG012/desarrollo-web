@@ -3,7 +3,7 @@ import { StatusCodes } from "../Enums/status-codes.enum";
 import { ApiError } from "../Errors";
 import { AppDataSource } from "../data-source";
 import { PlayRooms, WordsByCategory } from "../entities";
-import { Player, ResultsPayload, RoundInfo } from "../interfaces";
+import { Player, ResultsPayload, RoundInfo, SendPlayerInterface } from "../interfaces";
 import { GenericRepository } from "../repositories/common";
 import { WebSocket } from "ws";
 
@@ -134,8 +134,16 @@ export class GameUseCases {
         return true;
     }
 
-    public getPlayers(roomId:number):Player[]{
-        return this.roomsInfo[roomId]["roomPlayers"];
+    public getPlayersWebSocket(roomId:number):WebSocket[]{
+        return this.roomsInfo[roomId]["roomPlayers"].map((player:Player)=>player.ws);
+    }
+
+    public getPlayerInTurnWebSocket(roomId:number):WebSocket{
+        return this.roomsInfo[roomId]["player"].ws;
+    }
+
+    public getGuessersWebSocket(roomId:number):WebSocket[]{
+        return this.roomsInfo[roomId]["roomPlayers"].filter((player:Player)=>player.id !== this.roomsInfo[roomId]["player"].id).map((player:Player)=>player.ws);
     }
 
     public getResults(roomId:number):ResultsPayload[]{
@@ -163,14 +171,15 @@ export class GameUseCases {
         this.roomsInfo[roomId]["roomWords"].splice(this.roomsInfo[roomId]["wordIndex"],1);
     }
 
-    public getRoundInfo(roomId:number):{roundInfo:RoundInfo, playersWs:WebSocket[]}{
+    public getRoundInfo(roomId:number):RoundInfo{
         const word:string = this.roomsInfo[roomId]["roomWords"][this.roomsInfo[roomId]["wordIndex"]];
         const playerInTurn:Player = this.roomsInfo[roomId]["player"];
+        const playerInTurnSend:SendPlayerInterface = {id:playerInTurn.id,playRoomId:playerInTurn.playRoomId,name:playerInTurn.name,avatar:playerInTurn.avatar,score:playerInTurn.score};
         const guessers:Player[] = this.roomsInfo[roomId]["roomPlayers"].filter((player:Player)=>player.id !== playerInTurn.id);
-        const playersWs:WebSocket[] = guessers.map((player:Player)=>player.ws);
-        const roundInfo:RoundInfo = {playerInTurn,guessers,word};
+        const guessersSend:SendPlayerInterface[] = guessers.map((player:Player)=>({id:player.id,playRoomId:player.playRoomId,name:player.name,avatar:player.avatar,score:player.score}));
+        const roundInfo:RoundInfo = {playerInTurn:playerInTurnSend,guessers:guessersSend,word};
 
-        return {roundInfo:roundInfo, playersWs};
+        return roundInfo;
     }
 
     public wordGuessed(roomId:number, userAttempt:string):boolean{

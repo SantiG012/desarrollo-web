@@ -5,17 +5,15 @@ export class WebSocketUseCases {
 
     constructor(){}
 
-    public handleMessages(players:Player[], communication:Communication):void{
-        players.forEach(player=>{
-            if(!player.ws){return;}
-            player.ws.send(JSON.stringify(communication));
+    public handleMessages(webSockets:WebSocket[], communication:Communication):void{
+        webSockets.forEach(ws=>{
+           ws.send(JSON.stringify(communication));
         });
     }
 
-    public closeConnections(players:Player[]):void{
-        players.forEach(player=>{
-            if(!player.ws){return;}
-            player.ws.close();
+    public closeConnections(webSockets:WebSocket[]):void{
+        webSockets.forEach(ws=>{
+            ws.close();
         });
     }
 
