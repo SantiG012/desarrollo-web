@@ -99,8 +99,17 @@ export class GameUseCases {
         }
     }
 
-    public handleStartGame(roomId:number):void{
-        if(this.hasEnoughPlayers(roomId) && !this.hasSelectedPlayer(roomId)){this.startGame(roomId);}
+    public gameCanStart(roomId:number):boolean{
+        if(this.hasEnoughPlayers(roomId) && !this.hasSelectedPlayer(roomId)){return true;}
+        return false;
+    }
+
+    public startGame(roomId:number):void{
+        const randomIndex = Math.floor(Math.random() * this.roomsInfo[roomId]["roomPlayers"].length);
+        const player = this.roomsInfo[roomId]["roomPlayers"][randomIndex];
+        this.roomsInfo[roomId]["player"] = player;
+        this.roomsInfo[roomId]["initialTime"] = Date.now();
+        const word = this.roomsInfo[roomId]["roomWords"][this.roomsInfo[roomId]["wordIndex"]];
     }
 
     private hasEnoughPlayers(roomId:number):boolean{
@@ -136,18 +145,6 @@ export class GameUseCases {
         this.resetGame(roomId);
     }
 
-
-    public startGame(roomId:number):void{
-        const randomIndex = Math.floor(Math.random() * this.roomsInfo[roomId]["roomPlayers"].length);
-        const player = this.roomsInfo[roomId]["roomPlayers"][randomIndex];
-        this.roomsInfo[roomId]["player"] = player;
-        this.roomsInfo[roomId]["initialTime"] = Date.now();
-        const word = this.roomsInfo[roomId]["roomWords"][this.roomsInfo[roomId]["wordIndex"]];
-
-        player.ws.send(`!Es tu turno! La palabra es ${word}`);
-
-        this.send(`Es el turno de ${player.name}`,player.ws,roomId);
-    }
 
     private resetGame(roomId:number):void{
         this.roomsInfo[roomId]["guessOrdering"] = [];
