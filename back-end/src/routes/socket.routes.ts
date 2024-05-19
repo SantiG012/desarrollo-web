@@ -1,4 +1,4 @@
-import { NextFunction, Router } from "express";
+import { NextFunction, Router, json } from "express";
 import { ChatMessagePayload, Communication, Player, ResultsPayload, RoundInfo } from "../interfaces";
 import { WebScoketEventTypes } from "../Enums/ws-events-types.enum";
 import { PlayRoomStatus } from "../Enums/play-room-status.enum";
@@ -29,16 +29,15 @@ module.exports = (expressWs:any) =>{
     
         
             ws.on(WebScoketEventTypes.Message, async function (communicationInterface:Communication){
+                communicationInterface = JSON.parse(communicationInterface.toString());
                 const gameEventType = communicationInterface.gameEventType;
                 let players:Player[];
                 let message:string;
                 let roundInfo:RoundInfo;
                 let communication:Communication = {gameEventType:GameEventTypes.CHAT_MESSAGE};
-                
-
 
                 switch(gameEventType){
-                    case GameEventTypes.CHAT_MESSAGE:
+                    case GameEventTypes.CHAT_MESSAGE:{
                         const payload = communicationInterface.chatMessagePayload;
                         message = `${player.name}: ${payload?.message}`;
                         players = gameUseCases.getPlayers(roomId);
@@ -86,7 +85,12 @@ module.exports = (expressWs:any) =>{
 
                         webSocketUseCases.handleMessages(roundInfo.guessers,communication);
 
-                    case GameEventTypes.JOIN_GAME:
+                        break;
+                    }
+
+
+                    case GameEventTypes.JOIN_GAME:{
+                        console.log('Join game');
                         communication.gameEventType = GameEventTypes.ROUND_NOTIFICATION;
                         
                         gameUseCases.handleNewPlayer(player,roomId);
@@ -113,10 +117,15 @@ module.exports = (expressWs:any) =>{
                         communication.roundNotificationPayload.message = message;
 
                         webSocketUseCases.handleMessages(roundInfo.guessers,communication);
-                        
+                    
+                        break;
+                    }
 
-
-
+                    default:{
+                        console.log('Default');
+                        break;
+                    }
+                    
                 }
             })
     
