@@ -29,7 +29,22 @@ export class GameUseCases {
         this.wordsByCategoryRepository = new GenericRepository<WordsByCategory>(AppDataSource.getRepository(WordsByCategory));
     }
 
-    public async joinPlayRoom(player:Player,playRoomId:number):Promise<void>{
+
+    public async handleNewPlayer(player:Player,playRoomId:number):Promise<void>{
+        if(!this.roomExists(playRoomId) || this.isRoomWaitingPlayers(playRoomId)){await this.initializeEmptyRoomWithOnePlayer(playRoomId,player);}
+
+        await this.joinPlayRoom(player,playRoomId);
+    }
+
+    private roomExists(roomId:number):boolean{
+        return this.roomsInfo[roomId] !== undefined;
+    }
+
+    private isRoomWaitingPlayers(roomId:number):boolean{
+        return this.roomsInfo[roomId]["state"] === PlayRoomStatus.Waiting;
+    }
+
+    private async joinPlayRoom(player:Player,playRoomId:number):Promise<void>{
         const playRoomDb = await this.playRoomRepository.getOneBy({id:playRoomId})
 
         if(!playRoomDb){throw new ApiError(`La sala de juegos con id=${playRoomId} no existe`,StatusCodes.BadRequest)}
@@ -48,48 +63,7 @@ export class GameUseCases {
         roomPlayers.push(player);
     }
 
-    public canSendMessages(player:Player, roomId:number):boolean{
-        if (this.isDrawing(player, roomId)) { return false; }
-        if (this.alreadyWon(player, roomId)) { return false; }
-        return true;
-    }
-
-    public getPlayers(roomId:number):Player[]{
-        return this.roomsInfo[roomId]["roomPlayers"];
-    }
-
-    public getResults(roomId:number):ResultsPayload[]{
-        const results:ResultsPayload[] = this.roomsInfo[roomId]["roomPlayers"].map((player: Player) => ({
-            name: player.name,
-            score: player.score
-        }));
-
-        return results;
-    }
-
-    public handleGameOver(roomId:number):void{
-        this.deleteGuessedWord(roomId);
-        this.resetGame(roomId);
-    }
-
-    public async send(message:any,ws:any,playRoomId:number):Promise<void>{
-        const playRoomDb = await this.playRoomRepository.getOneBy({id:playRoomId})
-
-        if(!playRoomDb){throw new ApiError(`La sala de juegos con id=${playRoomId} no existe`,StatusCodes.BadRequest)}
-
-        const roomPlayers:Player[] = this.roomsInfo[playRoomId]["roomPlayers"]
-
-        if(!roomPlayers) {return;}
-        
-        roomPlayers.forEach((player:Player)=>{
-            if(!player.ws){return;}
-            if (player.ws !== ws && player.ws.readyState === 1) {
-                player.ws.send(message);
-            }
-        })
-    }
-
-    public async initializeEmptyRoomsInfo(roomId:number,player:Player):Promise<void>{
+    private async initializeEmptyRoomWithOnePlayer(roomId:number,player:Player):Promise<void>{
         const playRoomsDb:PlayRooms[] = await this.playRoomRepository.get({where:{id:roomId}, relations:{category:true}})
         const playRoomDb = playRoomsDb[0]
 
@@ -124,6 +98,44 @@ export class GameUseCases {
             state: playRoomDb.state
         }
     }
+
+    public handleStartGame(roomId:number):void{
+        if(this.hasEnoughPlayers(roomId) && !this.hasSelectedPlayer(roomId)){this.startGame(roomId);}
+    }
+
+    private hasEnoughPlayers(roomId:number):boolean{
+        return this.roomsInfo[roomId]["roomPlayers"].length > 1;
+    }
+
+    private hasSelectedPlayer(roomId:number):boolean{
+        return this.roomsInfo[roomId]["player"] !== undefined;
+    }
+
+
+    public canSendMessages(player:Player, roomId:number):boolean{
+        if (this.isDrawing(player, roomId)) { return false; }
+        if (this.alreadyWon(player, roomId)) { return false; }
+        return true;
+    }
+
+    public getPlayers(roomId:number):Player[]{
+        return this.roomsInfo[roomId]["roomPlayers"];
+    }
+
+    public getResults(roomId:number):ResultsPayload[]{
+        const results:ResultsPayload[] = this.roomsInfo[roomId]["roomPlayers"].map((player: Player) => ({
+            name: player.name,
+            score: player.score
+        }));
+
+        return results;
+    }
+
+    public handleGameOver(roomId:number):void{
+        this.deleteGuessedWord(roomId);
+        this.resetGame(roomId);
+    }
+
 
     public startGame(roomId:number):void{
         const randomIndex = Math.floor(Math.random() * this.roomsInfo[roomId]["roomPlayers"].length);
@@ -198,14 +210,6 @@ export class GameUseCases {
         if(playRoomDb){playRoomDb.state = PlayRoomStatus.Waiting; await this.playRoomRepository.update(playRoomDb)}
 
         return;
-    }
-
-    public hasEnoughPlayers(roomId:number):boolean{
-        return this.roomsInfo[roomId]["roomPlayers"].length > 1;
-    }
-
-    public hasSelectedPlayer(roomId:number):boolean{
-        return this.roomsInfo[roomId]["player"] !== undefined;
     }
 
     public generateNewPlayer(userId:string,name:string, avatar:string,playRoomId:number):Player{
