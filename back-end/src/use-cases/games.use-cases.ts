@@ -3,7 +3,7 @@ import { StatusCodes } from "../Enums/status-codes.enum";
 import { ApiError } from "../Errors";
 import { AppDataSource } from "../data-source";
 import { PlayRooms, WordsByCategory } from "../entities";
-import { Player, ResultsPayload } from "../interfaces";
+import { Player, ResultsPayload, RoundInfo } from "../interfaces";
 import { GenericRepository } from "../repositories/common";
 
 export class GameUseCases {
@@ -155,6 +155,14 @@ export class GameUseCases {
 
     private deleteGuessedWord(roomId:number):void{
         this.roomsInfo[roomId]["roomWords"].splice(this.roomsInfo[roomId]["wordIndex"],1);
+    }
+
+    public getRoundInfo(roomId:number):RoundInfo{
+        const word:string = this.roomsInfo[roomId]["roomWords"][this.roomsInfo[roomId]["wordIndex"]];
+        const playerInTurn:Player = this.roomsInfo[roomId]["player"];
+        const guessers:Player[] = this.roomsInfo[roomId]["roomPlayers"].filter((player:Player)=>player.id !== playerInTurn.id);
+
+        return {playerInTurn,guessers,word};
     }
 
     public wordGuessed(roomId:number, userAttempt:string):boolean{
