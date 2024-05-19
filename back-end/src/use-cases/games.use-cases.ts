@@ -104,6 +104,12 @@ export class GameUseCases {
         return false;
     }
 
+    public handleRoundOver(roomId:number):void{
+        this.deleteGuessedWord(roomId);
+        this.resetGame(roomId);
+        this.startGame(roomId);
+    }
+
     public startGame(roomId:number):void{
         const randomIndex = Math.floor(Math.random() * this.roomsInfo[roomId]["roomPlayers"].length);
         const player = this.roomsInfo[roomId]["roomPlayers"][randomIndex];
@@ -150,7 +156,6 @@ export class GameUseCases {
         this.roomsInfo[roomId]["guessOrdering"] = [];
         const wordsLength =  this.roomsInfo[roomId]["roomWords"].length
         this.roomsInfo[roomId]["wordIndex"] = Math.floor(Math.random() * wordsLength);
-        this.startGame(roomId);
     }
 
     private deleteGuessedWord(roomId:number):void{
