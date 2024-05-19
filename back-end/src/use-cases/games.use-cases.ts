@@ -188,7 +188,6 @@ export class GameUseCases {
 
     public isGameOver(roomId:number):boolean{
         const wordsLength =  this.roomsInfo[roomId]["roomWords"].length;
-        if(!this.allWon(roomId)){return false;}
         return wordsLength === 1;
     }
 
