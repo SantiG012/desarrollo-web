@@ -40,7 +40,7 @@ module.exports = (expressWs:any) =>{
                 switch(gameEventType){
                     case GameEventTypes.CHAT_MESSAGE:{
                         const payload = communicationInterface.chatMessagePayload;
-                        message = `${player.name}: ${payload?.message}`;
+                        message = `${payload?.message}`;
                         roomPlayersWebsockets = gameUseCases.getPlayersWebSocket(roomId);
                         const chatMessagePayload:ChatMessagePayload = {message,senderId:player.id,senderName:player.name};
                         communication = {gameEventType:GameEventTypes.CHAT_MESSAGE,chatMessagePayload:chatMessagePayload};
@@ -49,7 +49,7 @@ module.exports = (expressWs:any) =>{
 
                         if(!gameUseCases.wordGuessed(roomId,message)){ webSocketUseCases.handleMessages(roomPlayersWebsockets,communication);return;}
                         
-                        chatMessagePayload.message = `${player.name} ha acertado la palabra!`;
+                        chatMessagePayload.message = `ha acertado la palabra!`;
                         gameUseCases.updateScore(roomId,player);
                         webSocketUseCases.handleMessages(roomPlayersWebsockets,communication);
 
