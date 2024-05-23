@@ -14,6 +14,8 @@ sendButton.addEventListener("click",(e)=>{
     textBox.value = "";
 });
 
+canvas.addEventListener("mousemove",draw);
+
 function sendMessage(gameEventType){
     const message = textBox.value
     socket.send(JSON.stringify({
