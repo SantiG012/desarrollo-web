@@ -130,6 +130,14 @@ module.exports = (expressWs:any) =>{
                         break;
                     }
 
+                    case GameEventTypes.USER_DRAW:{
+                        const payload = communicationInterface.drawPayload;
+                        roomPlayersWebsockets = gameUseCases.getPlayersWebSocket(roomId);
+                        communication = {gameEventType:GameEventTypes.USER_DRAW,drawPayload:payload};
+                        webSocketUseCases.handleMessages(roomPlayersWebsockets,communication);
+                        break;
+                    }
+
                     default:{
                         console.log('Default');
                         break;
