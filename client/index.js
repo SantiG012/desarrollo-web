@@ -1,15 +1,35 @@
 const textBox = document.getElementById("input");
 const sendButton = document.getElementsByTagName("button")[0];
 const messages = document.getElementById("messages");
+const url = window.location.href; // Get the current URL
+const urlObj = new URL(url);  // Create a URL object
+const queryParams = new URLSearchParams(urlObj.search); // Get the query parameters
+const { userId, userName, userAvatar } = Object.fromEntries(queryParams.entries()); // Get the userId, name, and avatar from the query parameters
+
 
 
 
 sendButton.addEventListener("click",(e)=>{
     e.preventDefault();
-    sendMessage(GameEventType.CHAT_MESSAGE);
+    const message = textBox.value;
+    const chatMessagePayload = {message, senderId: userId, senderName: userName};
+    sendMessage(chatMessagePayload,GameEventType.CHAT_MESSAGE);
     textBox.value = "";
 });
 
+
+socket.onopen = function() {
+    console.log("WebSocket connection open.");
+    requestEntryToGameRoom();
+};
+
+socket.onmessage = function(event) {
+    handleEventType(JSON.parse(event.data));
+};
+
+function requestEntryToGameRoom(){
+    sendMessage({},GameEventType.ENTER_GAME_ROOM);
+}
 
 
 function handleEventType(communicationInterface){
@@ -27,6 +47,9 @@ function handleEventType(communicationInterface){
 }
 
 function handleRoundNotification(payload){
+    setPlayerInTurn(payload.roundInfo);
+    const isPlayerInTurn = isPlayerInTurn(userId);
+    setCanDrawCanvas(isPlayerInTurn);
     alert(payload.message);
 }
 
