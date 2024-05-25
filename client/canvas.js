@@ -1,11 +1,12 @@
 const canvas = document.getElementById("drawing-board");
 const ctx = canvas.getContext("2d");
+const chat = document.getElementById("chat");
 
 
 const canvasOffsetX = canvas.offsetLeft;
 const canvasOffsetY = canvas.offsetTop;
 
-canvas.width = window.innerWidth - canvasOffsetX;
+canvas.width = window.innerWidth - chat.offsetWidth;
 canvas.height = window.innerHeight - canvasOffsetY;
 
 let isPainting = false;
