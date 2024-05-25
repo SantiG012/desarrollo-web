@@ -26,11 +26,7 @@ function setPlayerInTurn(roundInfo){
     playerInTurn = roundInfo.playerInTurn;
 }
 
-<<<<<<< HEAD
 function isPlayerInTurn(){
-=======
-function isPlayerInTurn(userId){
->>>>>>> 2b51efc57c4a3c6176d057bcdd1fd441dd463dd6
     return playerInTurn.userId === userId;
 }
 
