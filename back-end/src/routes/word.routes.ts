@@ -6,6 +6,16 @@ const router = Router();
 
 const wordUseCases:WordUseCases = new WordUseCases();
 
+router.get("/",
+    async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            res.status(200).send(await wordUseCases.getAllWords());
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
 router.post("/", 
     schemaValidator("/words"),
     async (req: Request, res: Response, next:NextFunction) => {

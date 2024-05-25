@@ -11,6 +11,10 @@ export class WordUseCases {
         this.wordRepository =  new GenericRepository<Word>(AppDataSource.getRepository(Word));
     }
 
+    public async getAllWords():Promise<Word[]>{
+        return await this.wordRepository.get();
+    }
+
     public async addWord(word:Word):Promise<Word>{
         const wordText = word.text.toUpperCase()
 
