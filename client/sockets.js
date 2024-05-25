@@ -12,6 +12,7 @@ socket.onclose = function(){
 
 function closeConnection(){
     socket.close();
+    console.log("WebSocket connection closed.");
 }
 
 function sendMessage(payload, gameEventType){

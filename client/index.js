@@ -7,7 +7,10 @@ sendButton.addEventListener("click",(e)=>{
     e.preventDefault();
     const message = textBox.value;
     const chatMessagePayload = {message, senderId: userId, senderName: userName};
-    sendMessage(chatMessagePayload,GameEventType.CHAT_MESSAGE);
+    socket.send(JSON.stringify({
+        gameEventType: GameEventType.CHAT_MESSAGE,
+        chatMessagePayload
+    }));
     textBox.value = "";
 });
 
@@ -49,16 +52,17 @@ function handleEventType(communicationInterface){
         case GameEventType.CHAT_MESSAGE:
             handleChatMessage(communicationInterface.chatMessagePayload);
             break;
-        case GameEventType.FINISH_GAME:
-            handleFinishGame();
+        case GameEventType.GAME_OVER:
+            handleGameOver();
             break;
         case GameEventType.USER_DRAW:
-            console.log(communicationInterface);
             handleSentDraw(communicationInterface.drawPayload);
             break;
         case GameEventType.MOUSE_UP:
             handleSentMouseUp();
             break;
+        default:
+            console.error("Invalid game event type",communicationInterface);
 
     }
 }
@@ -109,9 +113,9 @@ function handleSentMouseUp(){
     handleMouseUp();
 }
 
-function handleFinishGame(){
+function handleGameOver(){
     removeChatMessages();
-    //closeConnection();
+    closeConnection();
     alert("Game has finished");
 }
 

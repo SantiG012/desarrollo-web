@@ -4,5 +4,5 @@ const GameEventType = Object.freeze({
     MOUSE_UP: "MOUSE_UP",
     ROUND_NOTIFICATION: 'ROUND_NOTIFICATION',
     JOIN_GAME: 'JOIN_GAME',
-    FINISH_GAME: 'FINISH_GAME',
+    GAME_OVER: 'GAME_OVER'
 });
