@@ -38,4 +38,3 @@ canvas.addEventListener("mouseup", (e) => {
 });
 
 
-canvas.addEventListener("mousemove", draw);

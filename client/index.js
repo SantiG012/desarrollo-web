@@ -17,6 +17,7 @@ sendButton.addEventListener("click",(e)=>{
     textBox.value = "";
 });
 
+canvas.addEventListener("mousemove", handlePlayerDrawing);
 
 socket.onopen = function() {
     console.log("WebSocket connection open.");
@@ -58,6 +59,21 @@ function handleChatMessage(chatMessagePayload){
     const item = document.createElement('li');
     item.textContent = `${senderName}: ${chatMessagePayload.message}`
     messages.appendChild(item);
+}
+
+function handlePlayerDrawing(){
+    if(!canDrawCanvas()){
+        return;
+    }
+
+    draw();
+
+    const gameEventType = GameEventType.USER_DRAW;
+    const x = e.clientX - canvasOffsetX;
+    const y = e.clientY;
+    const userDrawPayload = {x,y};
+    
+    sendMessage(userDrawPayload, gameEventType);
 }
 
 function handleFinishGame(){
