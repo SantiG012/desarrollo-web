@@ -58,6 +58,9 @@ function handleEventType(communicationInterface){
         case GameEventType.FINISH_GAME:
             handleFinishGame();
             break;
+        case GameEventType.USER_DRAW:
+            handleSentDraw(communicationInterface.userDrawPayload);
+            break;
     }
 }
 
@@ -88,6 +91,12 @@ function handlePlayerDrawing(){
     const userDrawPayload = {x,y};
 
     sendMessage(userDrawPayload, gameEventType);
+}
+
+function handleSentDraw(userDrawPayload){
+    const {x,y} = userDrawPayload;
+    ctx.lineTo(x,y);
+    ctx.stroke();
 }
 
 function handleFinishGame(){
