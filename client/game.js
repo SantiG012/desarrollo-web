@@ -27,7 +27,7 @@ function setPlayerInTurn(roundInfo){
 }
 
 function isPlayerInTurn(){
-    return playerInTurn.userId === userId;
+    return playerInTurn.id === userId;
 }
 
 function setCanDrawCanvas(canDrawCanvas){
