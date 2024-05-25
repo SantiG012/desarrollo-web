@@ -1,10 +1,6 @@
 const textBox = document.getElementById("input");
 const sendButton = document.getElementsByTagName("button")[0];
 const messages = document.getElementById("messages");
-const url = window.location.href; // Get the current URL
-const urlObj = new URL(url);  // Create a URL object
-const queryParams = new URLSearchParams(urlObj.search); // Get the query parameters
-const { userId, userName, userAvatar } = Object.fromEntries(queryParams.entries()); // Get the userId, name, and avatar from the query parameters
 
 
 
@@ -72,7 +68,7 @@ function handlePlayerDrawing(){
     const x = e.clientX - canvasOffsetX;
     const y = e.clientY;
     const userDrawPayload = {x,y};
-    
+
     sendMessage(userDrawPayload, gameEventType);
 }
 

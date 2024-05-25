@@ -1,3 +1,9 @@
+const url = window.location.href; // Get the current URL
+const urlObj = new URL(url);  // Create a URL object
+const queryParams = new URLSearchParams(urlObj.search); // Get the query parameters
+const { userId, userName, userAvatar } = Object.fromEntries(queryParams.entries()); // Get the userId, name, and avatar from the query parameters
+
+
 const playerInTurn = {"userId": "", "userName": "", "userAvatar": ""};
 let canDraw = false;
 
@@ -20,7 +26,7 @@ function setPlayerInTurn(roundInfo){
     playerInTurn = roundInfo.playerInTurn;
 }
 
-function isPlayerInTurn(userId){
+function isPlayerInTurn(){
     return playerInTurn.userId === userId;
 }
 
