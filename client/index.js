@@ -15,6 +15,13 @@ canvas.addEventListener("mousemove", (e) => {
     handlePlayerDrawing(e);
 });
 
+canvas.addEventListener("mouseup", (e) => {
+    handleMouseUp();
+    socket.send(JSON.stringify({
+        gameEventType: GameEventType.MOUSE_UP
+    }));
+});
+
 socket.onmessage = function(event) {
     handleEventType(JSON.parse(event.data));
 };
@@ -49,6 +56,8 @@ function handleEventType(communicationInterface){
             console.log(communicationInterface);
             handleSentDraw(communicationInterface.drawPayload);
             break;
+        case GameEventType.MOUSE_UP:
+
     }
 }
 
@@ -87,10 +96,15 @@ function handlePlayerDrawing(e){
 
 function handleSentDraw(userDrawPayload){
     if(isPlayerInTurn()){return;}
-    
+
     const {x,y} = userDrawPayload;
     ctx.lineTo(x,y);
     ctx.stroke();
+}
+
+function handleSentMouseUp(){
+    if(isPlayerInTurn()){return;}
+    handleMouseUp();
 }
 
 function handleFinishGame(){

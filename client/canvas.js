@@ -31,12 +31,11 @@ canvas.addEventListener("mousedown", (e) => {
     startY = e.clientY;
 });
   
-canvas.addEventListener("mouseup", (e) => {
+function handleMouseUp(){
     isPainting = false;
     ctx.stroke();
     ctx.beginPath();
-});
-
+}
 
 function isPlayerPainting(){
     return isPainting;
