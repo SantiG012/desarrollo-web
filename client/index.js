@@ -57,6 +57,8 @@ function handleEventType(communicationInterface){
             handleSentDraw(communicationInterface.drawPayload);
             break;
         case GameEventType.MOUSE_UP:
+            handleSentMouseUp();
+            break;
 
     }
 }
