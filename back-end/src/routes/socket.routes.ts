@@ -59,12 +59,11 @@ module.exports = (expressWs:any) =>{
 
                             communication.gameEventType = GameEventTypes.GAME_OVER;
                             communication.resultsPayload = resultsPayload;
-    
+ 
                             webSocketUseCases.handleMessages(roomPlayersWebsockets,communication);
     
                             webSocketUseCases.closeConnections(roomPlayersWebsockets);
-    
-                            gameUseCases.handleGameOver(roomId); // TODO: Check if this is necessary
+                            gameUseCases.handleGameOver(roomId);
                             return;
                         }
 
@@ -154,13 +153,15 @@ module.exports = (expressWs:any) =>{
             })
     
             ws.on(WebScoketEventTypes.Close,async function(){
+                if(gameUseCases.isRoomDeleted(roomId)){return;}
+
                 const message = `ha abandonado la partida, la sala se cerrará.`;
                 const roomPlayersWebsockets = gameUseCases.getPlayersWebSocket(roomId);
-                const communication:Communication = {gameEventType:GameEventTypes.FINISH_GAME,chatMessagePayload:{message,senderId:player.id,senderName:player.name}};
+                const communication:Communication = {gameEventType:GameEventTypes.GAME_OVER,chatMessagePayload:{message,senderId:player.id,senderName:player.name}};
 
                 webSocketUseCases.handleMessages(roomPlayersWebsockets,communication);
                 webSocketUseCases.closeConnections(roomPlayersWebsockets);
-                gameUseCases.roomsInfo[roomId] = undefined;
+                gameUseCases.handleGameOver(roomId);
             })
         } catch(error:ApiError | any){
             const statusCode = error.statusCode || 500;
