@@ -36,3 +36,6 @@ canvas.addEventListener("mouseup", (e) => {
     ctx.stroke();
     ctx.beginPath();
 });
+
+
+canvas.addEventListener("mousemove", draw);
