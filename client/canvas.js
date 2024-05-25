@@ -38,3 +38,6 @@ canvas.addEventListener("mouseup", (e) => {
 });
 
 
+function isPlayerPainting(){
+    return isPainting;
+}

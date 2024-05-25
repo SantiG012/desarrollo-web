@@ -47,7 +47,7 @@ function handleEventType(communicationInterface){
             break;
         case GameEventType.USER_DRAW:
             console.log(communicationInterface);
-            handleSentDraw(communicationInterface.userDrawPayload);
+            handleSentDraw(communicationInterface.drawPayload);
             break;
     }
 }
@@ -70,17 +70,24 @@ function handlePlayerDrawing(e){
         return;
     }
 
+    if(!isPlayerPainting()){return;}
+
     draw(e);
 
     const gameEventType = GameEventType.USER_DRAW;
     const x = e.clientX - canvasOffsetX;
     const y = e.clientY;
-    const userDrawPayload = {x,y};
+    const drawPayload = {x,y};
 
-    sendMessage(userDrawPayload, gameEventType);
+    socket.send(JSON.stringify({
+        gameEventType,
+        drawPayload
+    }));
 }
 
 function handleSentDraw(userDrawPayload){
+    if(isPlayerInTurn()){return;}
+    
     const {x,y} = userDrawPayload;
     ctx.lineTo(x,y);
     ctx.stroke();
