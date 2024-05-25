@@ -6,3 +6,4 @@ export * from './results-payload.interface';
 export * from './round-info.interface';
 export * from './round-notification-payload.interface';
 export * from './send-player.interface';
+export * from './draw-payload.interface';
