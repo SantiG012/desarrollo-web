@@ -11,6 +11,10 @@ export class CategoryUseCases {
         this.categoryRepository = new GenericRepository<Category>(AppDataSource.getRepository(Category));
     }
 
+    public async getCategories():Promise<Category[]>{
+        return await this.categoryRepository.get();
+    }
+
     public async addCategory(category:Category):Promise<Category>{
         const name = category.name.toUpperCase();
 

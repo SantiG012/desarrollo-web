@@ -6,6 +6,14 @@ const router = Router();
 
 const categoryUseCases:CategoryUseCases = new CategoryUseCases();
 
+router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        res.status(200).send(await categoryUseCases.getCategories());
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.post("/", schemaValidator("/categories"), async (req: Request, res: Response, next: NextFunction) => {
     const category = req.body;
 
