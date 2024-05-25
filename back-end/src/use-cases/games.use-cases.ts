@@ -156,8 +156,7 @@ export class GameUseCases {
     }
 
     public handleGameOver(roomId:number):void{
-        this.deleteGuessedWord(roomId);
-        this.resetGame(roomId);
+        this.roomsInfo[roomId] = undefined;
     }
 
 
@@ -201,6 +200,10 @@ export class GameUseCases {
     public isGameOver(roomId:number):boolean{
         const wordsLength =  this.roomsInfo[roomId]["roomWords"].length;
         return wordsLength === 1;
+    }
+
+    public isRoomDeleted(roomId:number):boolean{
+        return this.roomsInfo[roomId] === undefined;
     }
 
     public updateScore(roomId:number,player:Player):void{
