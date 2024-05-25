@@ -11,7 +11,9 @@ sendButton.addEventListener("click",(e)=>{
     textBox.value = "";
 });
 
-canvas.addEventListener("mousemove", handlePlayerDrawing);
+canvas.addEventListener("mousemove", (e) => {
+    handlePlayerDrawing(e);
+});
 
 socket.onmessage = function(event) {
     handleEventType(JSON.parse(event.data));
@@ -44,6 +46,7 @@ function handleEventType(communicationInterface){
             handleFinishGame();
             break;
         case GameEventType.USER_DRAW:
+            console.log(communicationInterface);
             handleSentDraw(communicationInterface.userDrawPayload);
             break;
     }
@@ -62,12 +65,12 @@ function handleChatMessage(chatMessagePayload){
     messages.appendChild(item);
 }
 
-function handlePlayerDrawing(){
+function handlePlayerDrawing(e){
     if(!canDrawCanvas()){
         return;
     }
 
-    draw();
+    draw(e);
 
     const gameEventType = GameEventType.USER_DRAW;
     const x = e.clientX - canvasOffsetX;
