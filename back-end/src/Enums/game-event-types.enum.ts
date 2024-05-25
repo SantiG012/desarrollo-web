@@ -5,4 +5,5 @@ export enum GameEventTypes {
     JOIN_GAME = 'JOIN_GAME',
     ROUND_NOTIFICATION = 'ROUND_NOTIFICATION',
     FINISH_GAME = 'FINISH_GAME',
+    MOUSE_UP = 'MOUSE_UP',
 }

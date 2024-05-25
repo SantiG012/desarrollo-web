@@ -132,8 +132,15 @@ module.exports = (expressWs:any) =>{
 
                     case GameEventTypes.USER_DRAW:{
                         const payload = communicationInterface.drawPayload;
-                        roomPlayersWebsockets = gameUseCases.getPlayersWebSocket(roomId);
+                        roomPlayersWebsockets = gameUseCases.getGuessersWebSocket(roomId);
                         communication = {gameEventType:GameEventTypes.USER_DRAW,drawPayload:payload};
+                        webSocketUseCases.handleMessages(roomPlayersWebsockets,communication);
+                        break;
+                    }
+
+                    case GameEventTypes.MOUSE_UP:{
+                        roomPlayersWebsockets = gameUseCases.getGuessersWebSocket(roomId);
+                        communication = {gameEventType:GameEventTypes.MOUSE_UP};
                         webSocketUseCases.handleMessages(roomPlayersWebsockets,communication);
                         break;
                     }
