@@ -156,9 +156,11 @@ module.exports = (expressWs:any) =>{
                 gameUseCases.roomsInfo[roomId] = undefined;
             })
         } catch(error:ApiError | any){
-            ws.send(JSON.stringify({status:error.statusCode,message:error.message}));
+            const statusCode = error.statusCode || 500;
+            const message = error.message || 'Internal server error';
+            ws.send(JSON.stringify({statusCode,message}));
             next(error);
-        }
+        }   
     })
 
     return router;
