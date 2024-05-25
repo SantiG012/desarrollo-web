@@ -4,7 +4,7 @@ const queryParams = new URLSearchParams(urlObj.search); // Get the query paramet
 const { userId, userName, userAvatar } = Object.fromEntries(queryParams.entries()); // Get the userId, name, and avatar from the query parameters
 
 
-const playerInTurn = {"userId": "", "userName": "", "userAvatar": ""};
+let playerInTurn = {"userId": "", "userName": "", "userAvatar": ""};
 let canDraw = false;
 
 function removeChatMessages(){
