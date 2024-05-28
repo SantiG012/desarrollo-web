@@ -55,11 +55,9 @@ export class GameUseCases {
         const roomPlayers:Player[] = this.roomsInfo[playRoomId]["roomPlayers"];
         const roomPlayerById:Player | undefined = roomPlayers.find((roomPlayer:Player)=>roomPlayer.id === player.id );
         const roomPlayerByName:Player | undefined = roomPlayers.find((roomPlayer:Player)=>roomPlayer.name === player.name );
-        const roomPlayerByAvatar:Player | undefined = roomPlayers.find((roomPlayer:Player)=>roomPlayer.avatar === player.avatar );
 
         if(roomPlayerById){throw new ApiError(`El jugador con id=${roomPlayerById.id} ya está en la sala de juego`,StatusCodes.BadRequest)}
         if(roomPlayerByName){throw new ApiError(`El jugador con nombre=${roomPlayerByName.name} ya está en la sala de juego`,StatusCodes.BadRequest)}
-        if(roomPlayerByAvatar){throw new ApiError(`El jugador con avatar=${roomPlayerByAvatar.avatar} ya está en la sala de juego`,StatusCodes.BadRequest)}
 
         roomPlayers.push(player);
     }
